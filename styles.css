@@ -109,7 +109,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 }
 
 /* ---------- Gallery ---------- */
-.gallery-container { position: relative; margin: 0 auto; max-width: 960px; }
+.gallery-container { position: relative; margin: 0 auto; max-width: 960px; scroll-margin-top: 72px; }
 .gallery-viewport { overflow: hidden; border-radius: var(--radius); }
 /* Grid width set dynamically by JS (slideCount × 100%). --slide-count also set by JS. */
 .gallery-grid { display: flex; transition: transform .4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
