@@ -75,7 +75,7 @@ async function loadGalleryImages() {
 
 function renderGallery() {
   const grid = $("galleryGrid");
-  grid.innerHTML = galleryPhotos.map((p, i) => `<img src="${esc(p.src.landscape)}" alt="Photo ${i + 1}" loading="lazy">`).join("");
+  grid.innerHTML = galleryPhotos.map((p, i) => `<img src="${esc(p.src.large2x)}" alt="Photo ${i + 1}" loading="lazy">`).join("");
   updateGalleryScroll();
 }
 
