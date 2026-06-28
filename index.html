@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@YourName — Creator Portfolio & Shop</title>
+    <meta name="description" content="Premium content creator. Shop exclusive merchandise, access exclusive content, and connect on social media.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://images.pexels.com">
+    <link rel="preconnect" href="https://api.pexels.com" crossorigin>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ===== Header / Nav ===== -->
+    <header class="site-header" id="top">
+        <div class="wrap nav">
+            <a href="#top" class="brand">
+                <span class="brand-name">@YourName</span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+            <nav class="nav-links" id="navLinks" aria-label="Primary">
+                <a href="#gallery">Gallery</a>
+                <a href="#shop">Shop</a>
+                <a href="#links">Links</a>
+                <a href="#exclusive">Exclusive</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== Hero ===== -->
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="wrap hero-inner">
+            <div class="hero-content">
+                <h1>@YourName</h1>
+                <p class="hero-subtitle">Premium creator • Content • Merch</p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#exclusive">Join Exclusive</a>
+                    <a class="btn btn-ghost" href="#gallery">View Gallery</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Gallery ===== -->
+    <section id="gallery" class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Portfolio</h2>
+                <p>Latest content and photos</p>
+            </div>
+            <div class="gallery-container">
+                <button class="gallery-arrow gallery-prev" id="galleryPrev" aria-label="Previous photo">❮</button>
+                <div class="gallery-viewport">
+                    <div class="gallery-grid" id="galleryGrid"></div>
+                </div>
+                <button class="gallery-arrow gallery-next" id="galleryNext" aria-label="Next photo">❯</button>
+            </div>
+            <div class="gallery-dots" id="galleryDots" aria-label="Gallery photos"></div>
+        </div>
+    </section>
+
+    <!-- ===== Social Links ===== -->
+    <section id="links" class="section section-dark">
+        <div class="wrap">
+            <div class="section-head light">
+                <h2>Follow & Connect</h2>
+                <p>Find me across all platforms</p>
+            </div>
+            <div class="links-grid" id="linksGrid"></div>
+        </div>
+    </section>
+
+    <!-- ===== Shop / Products ===== -->
+    <section id="shop" class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Shop</h2>
+                <p>Exclusive merchandise and content</p>
+            </div>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </section>
+
+    <!-- ===== Exclusive Content / Subscription ===== -->
+    <section id="exclusive" class="section section-tint">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Exclusive Access</h2>
+                <p>Get VIP content, early access, and behind-the-scenes updates</p>
+            </div>
+            <div class="exclusive-content">
+                <div class="exclusive-cards">
+                    <div class="exclusive-card">
+                        <div class="exc-icon">⭐</div>
+                        <h3>Fan Club</h3>
+                        <p class="price">$9.99/month</p>
+                        <ul class="exc-features">
+                            <li>Exclusive photos</li>
+                            <li>Monthly livestreams</li>
+                            <li>Custom shoutouts</li>
+                            <li>Early merch access</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                    </div>
+                    <div class="exclusive-card featured">
+                        <div class="exc-icon">👑</div>
+                        <h3>VIP Club</h3>
+                        <p class="price">$19.99/month</p>
+                        <ul class="exc-features">
+                            <li>All Fan Club perks</li>
+                            <li>Priority DMs</li>
+                            <li>1:1 video calls</li>
+                            <li>Exclusive merch items</li>
+                            <li>Special discounts</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                    </div>
+                    <div class="exclusive-card">
+                        <div class="exc-icon">💎</div>
+                        <h3>Platinum</h3>
+                        <p class="price">$49.99/month</p>
+                        <ul class="exc-features">
+                            <li>All VIP perks</li>
+                            <li>Custom content</li>
+                            <li>Weekly private calls</li>
+                            <li>Personal merchant account</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== About / Bio ===== -->
+    <section id="about" class="section section-dark">
+        <div class="wrap">
+            <div class="about-content">
+                <div class="about-text light">
+                    <h2>About Me</h2>
+                    <p>Hi! I'm a content creator passionate about connecting with my audience and sharing exclusive content. I create high-quality photos, videos, and behind-the-scenes moments that you won't find anywhere else.</p>
+                    <p>Join my exclusive community for early access to new content, special merch drops, and direct interaction with me.</p>
+                    <p><strong>📍 Location:</strong> Your City<br>
+                    <strong>📸 Content:</strong> Photography, Fashion, Lifestyle<br>
+                    <strong>⭐ Joined:</strong> 2024</p>
+                </div>
+                <div class="about-image" id="aboutImage"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Contact / DM ===== -->
+    <section id="contact" class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Get In Touch</h2>
+                <p>Have questions? Want to collaborate? Send a message.</p>
+            </div>
+            <form id="contactForm" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">— Select —</option>
+                        <option value="Collaboration">Collaboration Request</option>
+                        <option value="Question">Question</option>
+                        <option value="Feedback">Feedback</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                <p id="contactNote" class="form-note"></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- ===== Toast ===== -->
+    <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
