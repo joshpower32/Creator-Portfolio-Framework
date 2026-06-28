@@ -6,7 +6,7 @@ const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
   galleryQueries: ["fashion photography", "portrait photo", "creative photoshoot", "professional modeling", "lifestyle photography", "studio portrait"],
   heroBgQuery: "creative professional portrait",
-  aboutPhotoQuery: "confident portrait woman",
+  aboutPhotoQuery: "beautiful portrait woman professional headshot",
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
   creatorEmail: "hello@yourcreator.com",
   creatorName: "@YourName",
