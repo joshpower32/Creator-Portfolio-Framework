@@ -4,9 +4,10 @@
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
-  galleryQueries: ["erotic", "erotic", "erotic", "erotic", "erotic", "erotic"],
+  galleryQuery: "erotic",
+  galleryCount: 12,
   heroBgQuery: "erotic",
-  aboutPhotoQuery: "erotic",
+  aboutPhotoPage: 4,
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
   creatorEmail: "hello@yourcreator.com",
   creatorName: "@YourName",
@@ -36,27 +37,19 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 // --- Gallery state and control ---
 let galleryPhotos = [];
 let currentGalleryIndex = 0;
-const IMG_CACHE_KEY = "creator_imgcache_v2";
+const IMG_CACHE_KEY = "creator_imgcache_v3";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
-// Fetch gallery images from Pexels
+// Fetch gallery images from Pexels — single call, unique photos
 async function loadGalleryImages() {
-  const queries = CONFIG.galleryQueries;
-  let allPhotos = [];
-
   try {
-    for (let i = 0; i < queries.length; i++) {
-      const res = await fetch(
-        `https://api.pexels.com/v1/search?query=${encodeURIComponent(queries[i])}&per_page=1&orientation=landscape`,
-        { headers: { Authorization: CONFIG.pexelsKey } }
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.photos && data.photos.length > 0) {
-        allPhotos.push(data.photos[0]);
-      }
-    }
-    galleryPhotos = allPhotos;
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(CONFIG.galleryQuery)}&per_page=${CONFIG.galleryCount}&orientation=portrait&page=1`,
+      { headers: { Authorization: CONFIG.pexelsKey } }
+    );
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    galleryPhotos = data.photos || [];
     renderGallery();
     renderGalleryDots();
   } catch (_) {
@@ -142,7 +135,7 @@ async function loadAboutPhoto() {
   if (cached) { el.style.backgroundImage = `url("${cached}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; return; }
   try {
     const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(CONFIG.aboutPhotoQuery)}&per_page=1&orientation=portrait`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent("erotic")}&per_page=1&orientation=portrait&page=${CONFIG.aboutPhotoPage}`,
       { headers: { Authorization: CONFIG.pexelsKey } }
     );
     if (!res.ok) return;
