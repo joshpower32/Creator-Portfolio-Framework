@@ -19,6 +19,11 @@ const GALLERY_IDS = [
   289227,   // overhead pink floor — curly hair
   12642189, // young woman black lace pink bg
   8649515,  // black bob plaid dark interior
+  3622608,  // woman red lingerie dark studio
+  4946515,  // elegant black lace portrait
+  6474818,  // woman pink neon glow
+  8367573,  // dark boudoir silhouette
+  11356381, // sultry editorial — deep red tones
 ];
 const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
@@ -40,12 +45,8 @@ const SOCIAL_LINKS = [
 ];
 
 const PRODUCTS = [
-  { id: "p1", name: "Exclusive Photo Set", price: 9.99, desc: "10 exclusive photos — instant digital delivery", icon: "📸", badge: "Best Seller" },
-  { id: "p2", name: "Custom Shoutout Video", price: 19.99, desc: "Personalised 30-second video just for you", icon: "🎥", badge: "Popular" },
-  { id: "p3", name: "Signed Merch Item", price: 29.99, desc: "Hand-signed item shipped directly to you", icon: "👕" },
-  { id: "p4", name: "Behind-the-Scenes Pack", price: 14.99, desc: "30+ BTS photos from real shoots — instant access", icon: "🎬", badge: "New" },
-  { id: "p5", name: "Monthly Content Bundle", price: 24.99, desc: "50+ exclusive files delivered every month", icon: "📦" },
-  { id: "p6", name: "Premium Signed Print", price: 39.99, desc: "High-quality 11×14 signed print, free shipping", icon: "🖼️", badge: "Limited" },
+  { id: "p1", name: "Custom Video", price: 19.99, desc: "Personalised custom video made just for you — your request, your name, your moment", icon: "🎥", badge: "Popular" },
+  { id: "p2", name: "Merch & Items", price: 29.99, desc: "Exclusive branded merch, signed items, and limited drops shipped directly to you", icon: "👕", badge: "New" },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -55,8 +56,8 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 let galleryPhotos = [];
 let currentSlide = 0;       // which 2-photo slide is showing
 let lightboxIdx = 0;        // which individual photo is in the lightbox
-const GALLERY_TARGET = 16;  // always aim for an even count = clean slides
-const IMG_CACHE_KEY = "creator_imgcache_v6";
+const GALLERY_TARGET = 24;  // always aim for an even count = clean slides
+const IMG_CACHE_KEY = "creator_imgcache_v7";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // --- Load gallery: hardcoded IDs + fallback fill ---

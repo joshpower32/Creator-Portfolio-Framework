@@ -61,6 +61,8 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 .brand { display: flex; align-items: center; gap: 8px; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
 .brand:hover { text-decoration: none; color: var(--brand); }
 .brand-name { background: linear-gradient(135deg, var(--brand), #ff4081); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.brand { flex-direction: column; align-items: flex-start; gap: 1px; }
+.brand-tag { font-size: .65rem; font-weight: 400; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; line-height: 1; -webkit-text-fill-color: var(--muted); }
 .nav-links { display: flex; gap: 28px; margin-left: auto; }
 .nav-links a { color: var(--muted); font-weight: 500; font-size: .95rem; transition: color .2s ease; }
 .nav-links a:hover { color: var(--brand); text-decoration: none; }
