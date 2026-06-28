@@ -21,7 +21,7 @@ const GALLERY_IDS = [
   8649515,  // black bob plaid dark interior
 ];
 const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
-const HERO_PHOTO_ID  = 5103864;  // existing hero shot
+const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -31,21 +31,21 @@ const CONFIG = {
 };
 
 const SOCIAL_LINKS = [
-  { id: "instagram", name: "Instagram", icon: "📷", url: "https://instagram.com/yourname" },
-  { id: "tiktok", name: "TikTok", icon: "🎵", url: "https://tiktok.com/@yourname" },
-  { id: "onlyfans", name: "OnlyFans", icon: "❤️", url: "https://onlyfans.com/yourname" },
-  { id: "twitter", name: "Twitter", icon: "𝕏", url: "https://twitter.com/yourname" },
-  { id: "youtube", name: "YouTube", icon: "▶️", url: "https://youtube.com/@yourname" },
-  { id: "twitch", name: "Twitch", icon: "📺", url: "https://twitch.tv/yourname" },
+  { id: "instagram", name: "Instagram", icon: "📷", url: "https://instagram.com/yourname", handle: "@yourname", sub: "Daily photos, stories & behind-the-scenes", cta: "Follow Me" },
+  { id: "tiktok", name: "TikTok", icon: "🎵", url: "https://tiktok.com/@yourname", handle: "@yourname", sub: "Trending videos & viral content", cta: "Follow on TikTok" },
+  { id: "onlyfans", name: "OnlyFans", icon: "🔥", url: "https://onlyfans.com/yourname", handle: "yourname", sub: "Exclusive content you won't find anywhere else", cta: "Subscribe Now" },
+  { id: "twitter", name: "Twitter / X", icon: "𝕏", url: "https://twitter.com/yourname", handle: "@yourname", sub: "Uncensored thoughts, polls & updates", cta: "Follow Me" },
+  { id: "youtube", name: "YouTube", icon: "▶️", url: "https://youtube.com/@yourname", handle: "@yourname", sub: "Full-length videos, vlogs & Q&As", cta: "Subscribe" },
+  { id: "twitch", name: "Twitch", icon: "📺", url: "https://twitch.tv/yourname", handle: "yourname", sub: "Live streams — hang out in real time", cta: "Follow & Watch Live" },
 ];
 
 const PRODUCTS = [
-  { id: "p1", name: "Exclusive Photo Set", price: 9.99, desc: "10 exclusive unedited photos", icon: "📸" },
-  { id: "p2", name: "Custom Shoutout Video", price: 19.99, desc: "Personalized 30-second video message", icon: "🎥" },
-  { id: "p3", name: "Signed Merchandise", price: 29.99, desc: "Autographed merchandise item", icon: "👕" },
-  { id: "p4", name: "Behind-the-Scenes Pack", price: 14.99, desc: "30+ BTS photos from shoots", icon: "🎬" },
-  { id: "p5", name: "Monthly Digital Bundle", price: 24.99, desc: "Exclusive monthly content pack", icon: "📦" },
-  { id: "p6", name: "Premium Print", price: 39.99, desc: "High-quality 11x14 print", icon: "🖼️" },
+  { id: "p1", name: "Exclusive Photo Set", price: 9.99, desc: "10 exclusive photos — instant digital delivery", icon: "📸", badge: "Best Seller" },
+  { id: "p2", name: "Custom Shoutout Video", price: 19.99, desc: "Personalised 30-second video just for you", icon: "🎥", badge: "Popular" },
+  { id: "p3", name: "Signed Merch Item", price: 29.99, desc: "Hand-signed item shipped directly to you", icon: "👕" },
+  { id: "p4", name: "Behind-the-Scenes Pack", price: 14.99, desc: "30+ BTS photos from real shoots — instant access", icon: "🎬", badge: "New" },
+  { id: "p5", name: "Monthly Content Bundle", price: 24.99, desc: "50+ exclusive files delivered every month", icon: "📦" },
+  { id: "p6", name: "Premium Signed Print", price: 39.99, desc: "High-quality 11×14 signed print, free shipping", icon: "🖼️", badge: "Limited" },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -54,7 +54,7 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 // --- Gallery state and control ---
 let galleryPhotos = [];
 let currentGalleryIndex = 0;
-const IMG_CACHE_KEY = "creator_imgcache_v4";
+const IMG_CACHE_KEY = "creator_imgcache_v5";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // Fetch gallery images by hardcoded Pexels photo IDs
@@ -75,8 +75,31 @@ async function loadGalleryImages() {
 
 function renderGallery() {
   const grid = $("galleryGrid");
-  grid.innerHTML = galleryPhotos.map((p, i) => `<img src="${esc(p.src.large2x)}" alt="Photo ${i + 1}" loading="lazy">`).join("");
+  grid.innerHTML = galleryPhotos.map((p, i) => `<img src="${esc(p.src.large2x)}" alt="Photo ${i + 1}" loading="lazy" onclick="openLightbox(${i})" title="Click to view full size">`).join("");
   updateGalleryScroll();
+}
+
+// --- Lightbox ---
+function openLightbox(idx) {
+  currentGalleryIndex = idx;
+  $("lightboxImg").src = galleryPhotos[idx].src.large2x;
+  $("lightboxCounter").textContent = `${idx + 1} / ${galleryPhotos.length}`;
+  $("lightbox").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox() {
+  $("lightbox").hidden = true;
+  document.body.style.overflow = "";
+}
+function lightboxPrev() {
+  currentGalleryIndex = (currentGalleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+  $("lightboxImg").src = galleryPhotos[currentGalleryIndex].src.large2x;
+  $("lightboxCounter").textContent = `${currentGalleryIndex + 1} / ${galleryPhotos.length}`;
+}
+function lightboxNext() {
+  currentGalleryIndex = (currentGalleryIndex + 1) % galleryPhotos.length;
+  $("lightboxImg").src = galleryPhotos[currentGalleryIndex].src.large2x;
+  $("lightboxCounter").textContent = `${currentGalleryIndex + 1} / ${galleryPhotos.length}`;
 }
 
 function updateGalleryScroll() {
@@ -113,9 +136,20 @@ $("galleryPrev").addEventListener("click", galleryPrev);
 $("galleryNext").addEventListener("click", galleryNext);
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft") galleryPrev();
-  if (e.key === "ArrowRight") galleryNext();
+  if (!$("lightbox").hidden) {
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") lightboxPrev();
+    if (e.key === "ArrowRight") lightboxNext();
+  } else {
+    if (e.key === "ArrowLeft") galleryPrev();
+    if (e.key === "ArrowRight") galleryNext();
+  }
 });
+
+$("lightboxClose").addEventListener("click", closeLightbox);
+$("lightboxBackdrop").addEventListener("click", closeLightbox);
+$("lightboxPrev").addEventListener("click", lightboxPrev);
+$("lightboxNext").addEventListener("click", lightboxNext);
 
 // --- Render Social Links ---
 function renderSocialLinks() {
@@ -124,7 +158,9 @@ function renderSocialLinks() {
     <a href="${esc(link.url)}" target="_blank" rel="noopener" class="link-card">
       <div class="link-icon">${link.icon}</div>
       <h3>${esc(link.name)}</h3>
-      <p>Follow me here</p>
+      <p class="link-handle">${esc(link.handle)}</p>
+      <p>${esc(link.sub)}</p>
+      <span class="link-cta">${esc(link.cta)} →</span>
     </a>`).join("");
 }
 
@@ -133,12 +169,13 @@ function renderProducts() {
   const grid = $("productsGrid");
   grid.innerHTML = PRODUCTS.map((p) => `
     <div class="product-card">
-      <div class="product-image" style="font-size:4rem;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #1a1a1a, #0a0a0a);">${p.icon}</div>
+      ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
+      <div class="product-image">${p.icon}</div>
       <div class="product-info">
         <h3>${esc(p.name)}</h3>
         <div class="product-price">$${p.price.toFixed(2)}</div>
         <p class="product-desc">${esc(p.desc)}</p>
-        <a href="#contact" class="btn btn-primary btn-sm" style="width:100%;">Get Now</a>
+        <a href="#contact" class="btn btn-primary btn-sm" style="width:100%;">Buy Now →</a>
       </div>
     </div>`).join("");
 }

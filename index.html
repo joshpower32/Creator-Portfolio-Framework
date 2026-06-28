@@ -95,39 +95,44 @@
                     <div class="exclusive-card">
                         <div class="exc-icon">⭐</div>
                         <h3>Fan Club</h3>
-                        <p class="price">$9.99/month</p>
+                        <p class="price">$9.99<span class="price-unit">/month</span></p>
                         <ul class="exc-features">
-                            <li>Exclusive photos</li>
+                            <li>Exclusive photos & videos</li>
                             <li>Monthly livestreams</li>
                             <li>Custom shoutouts</li>
                             <li>Early merch access</li>
                         </ul>
-                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                        <a href="#contact" class="btn btn-ghost btn-sm btn-block">Get Started</a>
+                        <p class="cancel-note">Cancel anytime • No commitment</p>
                     </div>
                     <div class="exclusive-card featured">
+                        <span class="exc-badge">Most Popular</span>
                         <div class="exc-icon">👑</div>
                         <h3>VIP Club</h3>
-                        <p class="price">$19.99/month</p>
+                        <p class="price">$19.99<span class="price-unit">/month</span></p>
                         <ul class="exc-features">
-                            <li>All Fan Club perks</li>
-                            <li>Priority DMs</li>
-                            <li>1:1 video calls</li>
-                            <li>Exclusive merch items</li>
-                            <li>Special discounts</li>
+                            <li>Everything in Fan Club</li>
+                            <li>Priority DMs — I reply first</li>
+                            <li>Monthly 1:1 video call</li>
+                            <li>Exclusive merch drops</li>
+                            <li>Special discounts on shop</li>
                         </ul>
-                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                        <a href="#contact" class="btn btn-primary btn-sm btn-block">Join VIP →</a>
+                        <p class="cancel-note">Cancel anytime • No commitment</p>
                     </div>
                     <div class="exclusive-card">
                         <div class="exc-icon">💎</div>
                         <h3>Platinum</h3>
-                        <p class="price">$49.99/month</p>
+                        <p class="price">$49.99<span class="price-unit">/month</span></p>
                         <ul class="exc-features">
-                            <li>All VIP perks</li>
-                            <li>Custom content</li>
-                            <li>Weekly private calls</li>
-                            <li>Personal merchant account</li>
+                            <li>Everything in VIP</li>
+                            <li>Custom content on request</li>
+                            <li>Weekly private video calls</li>
+                            <li>Direct WhatsApp / Telegram</li>
+                            <li>First access to everything</li>
                         </ul>
-                        <a href="#contact" class="btn btn-primary btn-sm">Subscribe</a>
+                        <a href="#contact" class="btn btn-ghost btn-sm btn-block">Go Platinum</a>
+                        <p class="cancel-note">Limited spots available</p>
                     </div>
                 </div>
             </div>
@@ -156,34 +161,44 @@
         <div class="wrap">
             <div class="section-head">
                 <h2>Get In Touch</h2>
-                <p>Have questions? Want to collaborate? Send a message.</p>
+                <p>Brand deals, collabs, custom requests — slide into my inbox. I reply within 24 hours.</p>
             </div>
-            <form id="contactForm" class="contact-form">
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" name="name" required>
+            <div class="contact-wrap">
+                <div class="contact-info">
+                    <div class="contact-stat"><span>⚡</span><div><strong>Fast replies</strong><p>Usually within 24 hours</p></div></div>
+                    <div class="contact-stat"><span>💼</span><div><strong>Brand deals welcome</strong><p>Sponsored posts, partnerships & collabs</p></div></div>
+                    <div class="contact-stat"><span>🎨</span><div><strong>Custom content</strong><p>Personalized photos, videos & shoutouts</p></div></div>
+                    <div class="contact-stat"><span>🔒</span><div><strong>100% private</strong><p>Your message stays between us</p></div></div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <select id="subject" name="subject" required>
-                        <option value="">— Select —</option>
-                        <option value="Collaboration">Collaboration Request</option>
-                        <option value="Question">Question</option>
-                        <option value="Feedback">Feedback</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Send Message</button>
-                <p id="contactNote" class="form-note"></p>
-            </form>
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" placeholder="First name is fine" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="yourname@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">What's this about?</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">— Pick one —</option>
+                            <option value="Brand Deal">Brand Deal / Sponsorship</option>
+                            <option value="Collab">Collab Request</option>
+                            <option value="Custom Content">Custom Content Order</option>
+                            <option value="Membership">Membership Question</option>
+                            <option value="Shop">Shop / Order Question</option>
+                            <option value="Other">Something Else</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Tell me what you have in mind..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Send Message →</button>
+                    <p id="contactNote" class="form-note"></p>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -223,6 +238,16 @@
             </div>
         </div>
     </footer>
+
+    <!-- ===== Lightbox ===== -->
+    <div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Full size photo">
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+        <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+        <button class="lightbox-prev" id="lightboxPrev" aria-label="Previous photo">❮</button>
+        <img id="lightboxImg" src="" alt="Full size photo">
+        <button class="lightbox-next" id="lightboxNext" aria-label="Next photo">❯</button>
+        <p class="lightbox-counter" id="lightboxCounter"></p>
+    </div>
 
     <!-- ===== Toast ===== -->
     <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
