@@ -4,9 +4,9 @@
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
-  galleryQueries: ["erotic woman portrait", "sensual boudoir photography", "erotic fashion model", "glamour portrait woman", "erotic studio photography", "sensual woman lingerie"],
-  heroBgQuery: "erotic sensual woman portrait",
-  aboutPhotoQuery: "erotic woman face portrait closeup",
+  galleryQueries: ["erotic", "erotic", "erotic", "erotic", "erotic", "erotic"],
+  heroBgQuery: "erotic",
+  aboutPhotoQuery: "erotic",
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
   creatorEmail: "hello@yourcreator.com",
   creatorName: "@YourName",
@@ -36,7 +36,7 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 // --- Gallery state and control ---
 let galleryPhotos = [];
 let currentGalleryIndex = 0;
-const IMG_CACHE_KEY = "creator_imgcache";
+const IMG_CACHE_KEY = "creator_imgcache_v2";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // Fetch gallery images from Pexels
