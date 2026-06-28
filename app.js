@@ -16,6 +16,9 @@ const GALLERY_IDS = [
   12018041, // redhead black corset
   13441424, // colourful studio lighting
   5498471,  // black harness mask on bed
+  289227,   // overhead pink floor — curly hair
+  12642189, // young woman black lace pink bg
+  8649515,  // black bob plaid dark interior
 ];
 const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 5103864;  // existing hero shot
