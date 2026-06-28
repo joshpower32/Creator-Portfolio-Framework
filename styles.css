@@ -116,7 +116,11 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 /* Each slide = 1/N of grid = exactly 1 viewport width */
 .gallery-slide { flex: 0 0 calc(100% / var(--slide-count, 1)); display: flex; gap: 12px; box-sizing: border-box; }
 .gallery-slide img { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: 620px; object-fit: contain; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: box-shadow .2s ease; display: block; }
-.gallery-slide img:hover { box-shadow: 0 0 28px rgba(255,0,110,0.45); }
+.gallery-slide img:hover { box-shadow: 0 0 6px var(--brand), 0 0 20px var(--brand), 0 0 48px rgba(255,0,110,0.55); }
+.gallery-slide video { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: 620px; object-fit: cover; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: box-shadow .2s ease; display: block; }
+.gallery-slide video:hover { box-shadow: 0 0 6px var(--brand), 0 0 20px var(--brand), 0 0 48px rgba(255,0,110,0.55); }
+@media (max-width: 768px) { .gallery-slide video { height: 340px; } }
+#videoLightboxVid { position: relative; z-index: 1; max-height: 88vh; max-width: 88vw; border: 2px solid var(--brand); border-radius: var(--radius); box-shadow: 0 0 60px rgba(255,0,110,0.25); }
 .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.65); color: var(--brand); border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.6rem; cursor: pointer; transition: all .2s ease; z-index: 10; display: flex; align-items: center; justify-content: center; }
 .gallery-arrow:hover { background: rgba(0,0,0,0.9); transform: translateY(-50%) scale(1.1); }
 .gallery-prev { left: -68px; }

@@ -21,6 +21,7 @@
             <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">☰</button>
             <nav class="nav-links" id="navLinks" aria-label="Primary">
                 <a href="#galleryImages">Portfolio</a>
+                <a href="#videos">Videos</a>
                 <a href="#shop">Shop</a>
                 <a href="#links">Socials</a>
                 <a href="#exclusive">Membership</a>
@@ -49,7 +50,7 @@
     <section id="gallery" class="section">
         <div class="wrap">
             <div class="section-head">
-                <h2>Gallery Portfolio</h2>
+                <h2>Photo Gallery Portfolio</h2>
                 <p>Latest content and photos</p>
             </div>
             <div class="gallery-container" id="galleryImages">
@@ -60,6 +61,24 @@
                 <button class="gallery-arrow gallery-next" id="galleryNext" aria-label="Next photo">❯</button>
             </div>
             <div class="gallery-dots" id="galleryDots" aria-label="Gallery photos"></div>
+        </div>
+    </section>
+
+    <!-- ===== Video Gallery ===== -->
+    <section id="videos" class="section section-dark">
+        <div class="wrap">
+            <div class="section-head light">
+                <h2>Video Gallery Portfolio</h2>
+                <p>Exclusive video content and clips</p>
+            </div>
+            <div class="gallery-container" id="videoGalleryImages">
+                <button class="gallery-arrow gallery-prev" id="videoPrev" aria-label="Previous video">❮</button>
+                <div class="gallery-viewport">
+                    <div class="gallery-grid" id="videoGrid"></div>
+                </div>
+                <button class="gallery-arrow gallery-next" id="videoNext" aria-label="Next video">❯</button>
+            </div>
+            <div class="gallery-dots" id="videoDots"></div>
         </div>
     </section>
 
@@ -249,6 +268,15 @@
         <img id="lightboxImg" src="" alt="Full size photo">
         <button class="lightbox-next" id="lightboxNext" aria-label="Next photo">❯</button>
         <p class="lightbox-counter" id="lightboxCounter"></p>
+    </div>
+
+    <!-- ===== Video Lightbox ===== -->
+    <div id="videoLightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Full screen video">
+        <div class="lightbox-backdrop" id="videoLightboxBackdrop"></div>
+        <button class="lightbox-close" id="videoLightboxClose" aria-label="Close">✕</button>
+        <video id="videoLightboxVid" controls playsinline>
+            <source id="videoLightboxSrc" src="" type="video/mp4">
+        </video>
     </div>
 
     <!-- ===== Toast ===== -->

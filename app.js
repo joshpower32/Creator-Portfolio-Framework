@@ -181,11 +181,102 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeLightbox();
     if (e.key === "ArrowLeft") lightboxPrev();
     if (e.key === "ArrowRight") lightboxNext();
+  } else if (!$("videoLightbox").hidden) {
+    if (e.key === "Escape") closeVideoLightbox();
   } else {
     if (e.key === "ArrowLeft") galleryPrev();
     if (e.key === "ArrowRight") galleryNext();
   }
 });
+
+// --- Video Gallery ---
+let galleryVideos = [];
+let currentVideoSlide = 0;
+
+function videoSlideCount() { return Math.max(1, Math.ceil(galleryVideos.length / 2)); }
+
+function getBestVideoSrc(v) {
+  const files = (v.video_files || []).filter(f => f.file_type === "video/mp4");
+  const portrait = files.filter(f => f.height >= f.width);
+  const pool = portrait.length ? portrait : files;
+  return (pool.find(f => f.quality === "hd") || pool.find(f => f.quality === "sd") || pool[0])?.link || "";
+}
+
+async function loadVideos() {
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/videos/search?query=woman+fashion+model&per_page=10&orientation=portrait`,
+      { headers: { Authorization: CONFIG.pexelsKey } }
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    let videos = (data.videos || []).filter(v => getBestVideoSrc(v));
+    if (videos.length % 2 !== 0 && videos.length > 1) videos = videos.slice(0, videos.length - 1);
+    galleryVideos = videos;
+    renderVideoGallery();
+    renderVideoDots();
+  } catch {}
+}
+
+function renderVideoGallery() {
+  const grid = $("videoGrid");
+  const sc = videoSlideCount();
+  grid.style.width = `${sc * 100}%`;
+  grid.style.setProperty("--slide-count", sc);
+  const slides = [];
+  for (let i = 0; i < galleryVideos.length; i += 2) {
+    const v1 = galleryVideos[i];
+    const v2 = galleryVideos[i + 1];
+    slides.push(`<div class="gallery-slide">
+      <video src="${esc(getBestVideoSrc(v1))}" autoplay muted loop playsinline preload="metadata" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
+      ${v2 ? `<video src="${esc(getBestVideoSrc(v2))}" autoplay muted loop playsinline preload="metadata" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
+    </div>`);
+  }
+  grid.innerHTML = slides.join("");
+  updateVideoScroll();
+}
+
+function updateVideoScroll() {
+  const sc = videoSlideCount();
+  $("videoGrid").style.transform = `translateX(${-currentVideoSlide * (100 / sc)}%)`;
+}
+
+function renderVideoDots() {
+  $("videoDots").innerHTML = Array.from({ length: videoSlideCount() }, (_, i) =>
+    `<button class="gallery-dot ${i === currentVideoSlide ? "active" : ""}" onclick="setVideoSlide(${i})" aria-label="Video slide ${i + 1}"></button>`
+  ).join("");
+}
+
+function setVideoSlide(i) {
+  currentVideoSlide = Math.max(0, Math.min(i, videoSlideCount() - 1));
+  updateVideoScroll();
+  renderVideoDots();
+}
+
+function videoPrev() { setVideoSlide(currentVideoSlide - 1); }
+function videoNext() { setVideoSlide(currentVideoSlide + 1); }
+
+function openVideoLightbox(idx) {
+  const v = galleryVideos[idx];
+  $("videoLightboxSrc").src = getBestVideoSrc(v);
+  const vid = $("videoLightboxVid");
+  vid.load();
+  vid.play().catch(() => {});
+  $("videoLightbox").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeVideoLightbox() {
+  $("videoLightboxVid").pause();
+  $("videoLightboxSrc").src = "";
+  $("videoLightbox").hidden = true;
+  document.body.style.overflow = "";
+}
+
+$("videoPrev").addEventListener("click", videoPrev);
+$("videoNext").addEventListener("click", videoNext);
+$("videoLightboxClose").addEventListener("click", closeVideoLightbox);
+$("videoLightboxBackdrop").addEventListener("click", closeVideoLightbox);
 
 // --- Render Social Links ---
 function renderSocialLinks() {
@@ -336,6 +427,7 @@ function toast(msg) {
 
 // --- Init ---
 loadGalleryImages();
+loadVideos();
 renderSocialLinks();
 renderProducts();
 loadAboutPhoto();
