@@ -2,12 +2,26 @@
    Creator Portfolio — Gallery, Products, Links, and Contact Integration
    ===================================================================== */
 
+// Hardcoded Pexels photo IDs — gallery, hero, about all pinned to specific shots
+const GALLERY_IDS = [
+  12757296, // purple neon bed — moody dark
+  5393845,  // black bob knit wrap — elegant
+  8169253,  // red bodysuit dark background
+  6130800,  // satin & rose — luxe
+  12995318, // red lingerie with roses on bed
+  12001720, // black bodysuit red gloves
+  10670356, // leather jacket red chair
+  13400492, // blue glowing stool — artistic
+  7037652,  // black lace lingerie standing
+  12018041, // redhead black corset
+  13441424, // colourful studio lighting
+  5498471,  // black harness mask on bed
+];
+const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
+const HERO_PHOTO_ID  = 5103864;  // existing hero shot
+
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
-  galleryQuery: "erotic",
-  galleryCount: 12,
-  heroBgQuery: "erotic",
-  aboutPhotoPage: 4,
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
   creatorEmail: "hello@yourcreator.com",
   creatorName: "@YourName",
@@ -37,23 +51,22 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 // --- Gallery state and control ---
 let galleryPhotos = [];
 let currentGalleryIndex = 0;
-const IMG_CACHE_KEY = "creator_imgcache_v3";
+const IMG_CACHE_KEY = "creator_imgcache_v4";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
-// Fetch gallery images from Pexels — single call, unique photos
+// Fetch gallery images by hardcoded Pexels photo IDs
 async function loadGalleryImages() {
   try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(CONFIG.galleryQuery)}&per_page=${CONFIG.galleryCount}&orientation=portrait&page=1`,
-      { headers: { Authorization: CONFIG.pexelsKey } }
-    );
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    galleryPhotos = data.photos || [];
+    const photos = await Promise.all(GALLERY_IDS.map(async (id) => {
+      const res = await fetch(`https://api.pexels.com/v1/photos/${id}`,
+        { headers: { Authorization: CONFIG.pexelsKey } });
+      return res.ok ? res.json() : null;
+    }));
+    galleryPhotos = photos.filter(Boolean);
     renderGallery();
     renderGalleryDots();
   } catch (_) {
-    $("galleryGrid").innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#b0b0b0;padding:40px;'>Unable to load gallery. Check your API key.</p>";
+    $("galleryGrid").innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#b0b0b0;padding:40px;'>Unable to load gallery.</p>";
   }
 }
 
@@ -134,20 +147,16 @@ async function loadAboutPhoto() {
   const cached = imgCache[cacheKey]?.url;
   if (cached) { el.style.backgroundImage = `url("${cached}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; return; }
   try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent("erotic")}&per_page=1&orientation=portrait&page=${CONFIG.aboutPhotoPage}`,
-      { headers: { Authorization: CONFIG.pexelsKey } }
-    );
+    const res = await fetch(`https://api.pexels.com/v1/photos/${ABOUT_PHOTO_ID}`,
+      { headers: { Authorization: CONFIG.pexelsKey } });
     if (!res.ok) return;
     const data = await res.json();
-    if (data.photos && data.photos.length > 0) {
-      const url = data.photos[0].src.medium;
-      imgCache[cacheKey] = { url };
-      localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
-      el.style.backgroundImage = `url("${url}")`;
-      el.style.backgroundSize = "cover";
-      el.style.backgroundPosition = "center";
-    }
+    const url = data.src.large;
+    imgCache[cacheKey] = { url };
+    localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
+    el.style.backgroundImage = `url("${url}")`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center top";
   } catch (_) {}
 }
 
@@ -158,18 +167,14 @@ async function loadHeroBg() {
   const cached = imgCache[cacheKey]?.url;
   if (cached) { el.style.backgroundImage = `url("${cached}")`; return; }
   try {
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(CONFIG.heroBgQuery)}&per_page=1&orientation=landscape`,
-      { headers: { Authorization: CONFIG.pexelsKey } }
-    );
+    const res = await fetch(`https://api.pexels.com/v1/photos/${HERO_PHOTO_ID}`,
+      { headers: { Authorization: CONFIG.pexelsKey } });
     if (!res.ok) return;
     const data = await res.json();
-    if (data.photos && data.photos.length > 0) {
-      const url = data.photos[0].src.landscape;
-      imgCache[cacheKey] = { url };
-      localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
-      el.style.backgroundImage = `url("${url}")`;
-    }
+    const url = data.src.landscape;
+    imgCache[cacheKey] = { url };
+    localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
+    el.style.backgroundImage = `url("${url}")`;
   } catch (_) {}
 }
 
