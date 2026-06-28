@@ -4,9 +4,9 @@
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
-  galleryQueries: ["fashion photography", "portrait photo", "creative photoshoot", "professional modeling", "lifestyle photography", "studio portrait"],
-  heroBgQuery: "creative professional portrait",
-  aboutPhotoQuery: "sexy woman portrait face beautiful",
+  galleryQueries: ["erotic woman portrait", "sensual boudoir photography", "erotic fashion model", "glamour portrait woman", "erotic studio photography", "sensual woman lingerie"],
+  heroBgQuery: "erotic sensual woman portrait",
+  aboutPhotoQuery: "erotic woman face portrait closeup",
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
   creatorEmail: "hello@yourcreator.com",
   creatorName: "@YourName",
