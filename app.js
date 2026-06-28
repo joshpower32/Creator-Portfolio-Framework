@@ -51,39 +51,106 @@ const PRODUCTS = [
 const $ = (id) => document.getElementById(id);
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// --- Gallery state and control ---
+// --- Gallery state ---
 let galleryPhotos = [];
-let currentGalleryIndex = 0;
-const IMG_CACHE_KEY = "creator_imgcache_v5";
+let currentSlide = 0;       // which 2-photo slide is showing
+let lightboxIdx = 0;        // which individual photo is in the lightbox
+const GALLERY_TARGET = 16;  // always aim for an even count = clean slides
+const IMG_CACHE_KEY = "creator_imgcache_v6";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
-// Fetch gallery images by hardcoded Pexels photo IDs
+// --- Load gallery: hardcoded IDs + fallback fill ---
 async function loadGalleryImages() {
-  try {
-    const photos = await Promise.all(GALLERY_IDS.map(async (id) => {
+  // Fetch each hardcoded ID (use localStorage cache to skip re-fetching)
+  const fetched = await Promise.all(GALLERY_IDS.map(async (id) => {
+    const cacheKey = "pid_" + id;
+    if (imgCache[cacheKey]) return imgCache[cacheKey];
+    try {
       const res = await fetch(`https://api.pexels.com/v1/photos/${id}`,
         { headers: { Authorization: CONFIG.pexelsKey } });
-      return res.ok ? res.json() : null;
-    }));
-    galleryPhotos = photos.filter(Boolean);
-    renderGallery();
-    renderGalleryDots();
-  } catch (_) {
-    $("galleryGrid").innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#b0b0b0;padding:40px;'>Unable to load gallery.</p>";
+      if (!res.ok) return null;
+      const p = await res.json();
+      imgCache[cacheKey] = p;
+      return p;
+    } catch { return null; }
+  }));
+
+  let photos = fetched.filter(Boolean);
+
+  // Fill any gaps up to GALLERY_TARGET from a Pexels search
+  if (photos.length < GALLERY_TARGET) {
+    const need = GALLERY_TARGET - photos.length;
+    const existIds = new Set(photos.map(p => p.id));
+    try {
+      const res = await fetch(
+        `https://api.pexels.com/v1/search?query=erotic&per_page=${need + 4}&orientation=portrait&page=2`,
+        { headers: { Authorization: CONFIG.pexelsKey } });
+      if (res.ok) {
+        const data = await res.json();
+        const extras = (data.photos || []).filter(p => !existIds.has(p.id)).slice(0, need);
+        photos = [...photos, ...extras];
+      }
+    } catch { /* keep what we have */ }
   }
+
+  // Ensure even count so no half-empty last slide
+  if (photos.length % 2 !== 0 && photos.length > 1) photos = photos.slice(0, photos.length - 1);
+
+  localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
+  galleryPhotos = photos;
+  renderGallery();
+  renderGalleryDots();
 }
 
+function slideCount() { return Math.max(1, Math.ceil(galleryPhotos.length / 2)); }
+
+// Render paired slides — each slide = 2 photos side by side
 function renderGallery() {
   const grid = $("galleryGrid");
-  grid.innerHTML = galleryPhotos.map((p, i) => `<img src="${esc(p.src.large2x)}" alt="Photo ${i + 1}" loading="lazy" onclick="openLightbox(${i})" title="Click to view full size">`).join("");
+  const sc = slideCount();
+  grid.style.width = `${sc * 100}%`;
+  grid.style.setProperty("--slide-count", sc);
+
+  const slides = [];
+  for (let i = 0; i < galleryPhotos.length; i += 2) {
+    const p1 = galleryPhotos[i];
+    const p2 = galleryPhotos[i + 1];
+    slides.push(`<div class="gallery-slide">
+      <img src="${esc(p1.src.large)}" alt="Photo ${i + 1}" loading="lazy" onclick="openLightbox(${i})" title="Click to view full size">
+      ${p2 ? `<img src="${esc(p2.src.large)}" alt="Photo ${i + 2}" loading="lazy" onclick="openLightbox(${i + 1})" title="Click to view full size">` : ""}
+    </div>`);
+  }
+  grid.innerHTML = slides.join("");
   updateGalleryScroll();
 }
 
-// --- Lightbox ---
-function openLightbox(idx) {
-  currentGalleryIndex = idx;
-  $("lightboxImg").src = galleryPhotos[idx].src.large2x;
-  $("lightboxCounter").textContent = `${idx + 1} / ${galleryPhotos.length}`;
+function updateGalleryScroll() {
+  const sc = slideCount();
+  // Moving 1 slide = (1/sc) * 100% of the total grid width = exactly 1 viewport width
+  $("galleryGrid").style.transform = `translateX(${-currentSlide * (100 / sc)}%)`;
+}
+
+function renderGalleryDots() {
+  const sc = slideCount();
+  $("galleryDots").innerHTML = Array.from({ length: sc }, (_, i) =>
+    `<button class="gallery-dot ${i === currentSlide ? "active" : ""}" onclick="setSlide(${i})" aria-label="Slide ${i + 1}"></button>`
+  ).join("");
+}
+
+function setSlide(i) {
+  currentSlide = Math.max(0, Math.min(i, slideCount() - 1));
+  updateGalleryScroll();
+  renderGalleryDots();
+}
+
+function galleryPrev() { setSlide(currentSlide - 1); }
+function galleryNext() { setSlide(currentSlide + 1); }
+
+// --- Lightbox: scrolls 1 photo at a time ---
+function openLightbox(photoIdx) {
+  lightboxIdx = photoIdx;
+  $("lightboxImg").src = galleryPhotos[photoIdx].src.large2x;
+  $("lightboxCounter").textContent = `${photoIdx + 1} / ${galleryPhotos.length}`;
   $("lightbox").hidden = false;
   document.body.style.overflow = "hidden";
 }
@@ -92,48 +159,22 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 function lightboxPrev() {
-  currentGalleryIndex = (currentGalleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
-  $("lightboxImg").src = galleryPhotos[currentGalleryIndex].src.large2x;
-  $("lightboxCounter").textContent = `${currentGalleryIndex + 1} / ${galleryPhotos.length}`;
+  lightboxIdx = (lightboxIdx - 1 + galleryPhotos.length) % galleryPhotos.length;
+  $("lightboxImg").src = galleryPhotos[lightboxIdx].src.large2x;
+  $("lightboxCounter").textContent = `${lightboxIdx + 1} / ${galleryPhotos.length}`;
 }
 function lightboxNext() {
-  currentGalleryIndex = (currentGalleryIndex + 1) % galleryPhotos.length;
-  $("lightboxImg").src = galleryPhotos[currentGalleryIndex].src.large2x;
-  $("lightboxCounter").textContent = `${currentGalleryIndex + 1} / ${galleryPhotos.length}`;
-}
-
-function updateGalleryScroll() {
-  const grid = $("galleryGrid");
-  grid.style.transform = `translateX(${-currentGalleryIndex * 100}%)`;
-}
-
-function renderGalleryDots() {
-  const dots = $("galleryDots");
-  dots.innerHTML = galleryPhotos.map((_, i) =>
-    `<button class="gallery-dot ${i === currentGalleryIndex ? "active" : ""}" onclick="setGalleryIndex(${i})" aria-label="Photo ${i + 1}"></button>`
-  ).join("");
-}
-
-function setGalleryIndex(idx) {
-  currentGalleryIndex = idx;
-  updateGalleryScroll();
-  renderGalleryDots();
-}
-
-function galleryPrev() {
-  currentGalleryIndex = (currentGalleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
-  updateGalleryScroll();
-  renderGalleryDots();
-}
-
-function galleryNext() {
-  currentGalleryIndex = (currentGalleryIndex + 1) % galleryPhotos.length;
-  updateGalleryScroll();
-  renderGalleryDots();
+  lightboxIdx = (lightboxIdx + 1) % galleryPhotos.length;
+  $("lightboxImg").src = galleryPhotos[lightboxIdx].src.large2x;
+  $("lightboxCounter").textContent = `${lightboxIdx + 1} / ${galleryPhotos.length}`;
 }
 
 $("galleryPrev").addEventListener("click", galleryPrev);
 $("galleryNext").addEventListener("click", galleryNext);
+$("lightboxClose").addEventListener("click", closeLightbox);
+$("lightboxBackdrop").addEventListener("click", closeLightbox);
+$("lightboxPrev").addEventListener("click", lightboxPrev);
+$("lightboxNext").addEventListener("click", lightboxNext);
 
 document.addEventListener("keydown", (e) => {
   if (!$("lightbox").hidden) {
@@ -145,11 +186,6 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") galleryNext();
   }
 });
-
-$("lightboxClose").addEventListener("click", closeLightbox);
-$("lightboxBackdrop").addEventListener("click", closeLightbox);
-$("lightboxPrev").addEventListener("click", lightboxPrev);
-$("lightboxNext").addEventListener("click", lightboxNext);
 
 // --- Render Social Links ---
 function renderSocialLinks() {
