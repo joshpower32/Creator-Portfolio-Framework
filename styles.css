@@ -121,8 +121,8 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 .gallery-slide video:hover { border-color: #ff1aff; border-width: 3px; }
 @media (max-width: 768px) { .gallery-slide video { height: 340px; } }
 #videoLightboxVid { position: relative; z-index: 1; max-height: 88vh; max-width: 88vw; border: 2px solid var(--brand); border-radius: var(--radius); box-shadow: 0 0 60px rgba(255,0,110,0.25); }
-.gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.65); color: var(--brand); border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.6rem; cursor: pointer; transition: all .2s ease; z-index: 10; display: flex; align-items: center; justify-content: center; }
-.gallery-arrow:hover { background: rgba(0,0,0,0.9); transform: translateY(-50%) scale(1.1); }
+.gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.65); color: var(--brand); border: 2px solid var(--brand); width: 50px; height: 50px; border-radius: 50%; font-size: 1.6rem; cursor: pointer; transition: border-color .2s ease, border-width .2s ease; z-index: 10; display: flex; align-items: center; justify-content: center; }
+.gallery-arrow:hover { background: rgba(0,0,0,0.65); transform: translateY(-50%); border-color: #ff1aff; border-width: 3px; }
 .gallery-prev { left: -68px; }
 .gallery-next { right: -68px; }
 .gallery-dots { display: flex; gap: 8px; justify-content: center; margin-top: 24px; }
