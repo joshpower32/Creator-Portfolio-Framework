@@ -27,7 +27,7 @@ const VIDEO_IDS = [
   27588385, 27588382,  // slide 1  — yellow bikini babe
   26889136, 31223573,  // slide 2
   27259483, 27259473,  // slide 3
-  27588382, 27588431,  // slide 4
+  27588382, 28879306,  // slide 4
   31223581, 27588390,  // slide 5
   27588430, 27588419,  // slide 6
   27588427, 27588421,  // slide 7  — brunette red bikini bike helmet
@@ -46,7 +46,7 @@ const VIDEO_IDS = [
   27588413, 36330924,  // slide 22
   27179741, 27588418,  // slide 23
 ];
-const VID_CACHE_KEY = "creator_vidcache_v7";
+const VID_CACHE_KEY = "creator_vidcache_v8";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
