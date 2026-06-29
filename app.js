@@ -375,7 +375,12 @@ function playCurrentVideoSlide() {
         if (v.readyState >= 2) {
           tryPlay();
         } else {
+          // Register listener BEFORE load() so we never miss the event
           v.addEventListener("canplay", tryPlay, { once: true });
+          // readyState 0 = HAVE_NOTHING — browser hasn't fetched anything yet
+          // (happens when preload="none" was set). Must call load() explicitly
+          // or the browser won't start downloading even after preload="auto".
+          if (v.readyState === 0) v.load();
         }
       } else if (isNeighbor) {
         // Pre-buffer adjacent slide so it's ready instantly
