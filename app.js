@@ -230,7 +230,9 @@ function getBestVideoSrc(v, quality = "hd") {
   const portrait = files.filter(f => f.height >= f.width);
   const pool = portrait.length ? portrait : files;
   if (quality === "sd") {
-    return (pool.find(f => f.quality === "sd") || pool.find(f => f.quality === "hd") || pool[0])?.link || "";
+    // Only use SD if it's at least 400px on the short side — otherwise HD looks far better
+    const sd = pool.find(f => f.quality === "sd" && Math.min(f.width, f.height) >= 400);
+    return (sd || pool.find(f => f.quality === "hd") || pool[0])?.link || "";
   }
   return (pool.find(f => f.quality === "hd") || pool.find(f => f.quality === "sd") || pool[0])?.link || "";
 }
