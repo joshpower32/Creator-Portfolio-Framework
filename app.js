@@ -358,37 +358,27 @@ function playCurrentVideoSlide() {
       const isCurrent = i === currentVideoSlide + 1;
       const isNeighbor = Math.abs(i - (currentVideoSlide + 1)) === 1;
 
-      // Always remove old stall handler before reassigning
+      // Clean up stall handler whenever the role changes
       if (v._stallHandler) {
         v.removeEventListener("waiting", v._stallHandler);
         v.removeEventListener("stalled", v._stallHandler);
         v._stallHandler = null;
       }
-      if (v._canplayHandler) {
-        v.removeEventListener("canplay", v._canplayHandler);
-        v._canplayHandler = null;
-      }
 
       if (isCurrent) {
-        // Force a load if preload wasn't already active so the browser starts fetching
-        if (v.preload !== "auto") {
-          v.preload = "auto";
-          v.load();
-        }
+        v.preload = "auto";
         const tryPlay = () => v.play().catch(() => {});
-        // Re-try play on any buffer stall — keeps the video running on slow connections
+        // Re-try on any buffer stall so the video keeps running
         v._stallHandler = () => setTimeout(tryPlay, 300);
         v.addEventListener("waiting", v._stallHandler);
         v.addEventListener("stalled", v._stallHandler);
-
         if (v.readyState >= 2) {
           tryPlay();
         } else {
-          v._canplayHandler = tryPlay;
-          v.addEventListener("canplay", v._canplayHandler, { once: true });
+          v.addEventListener("canplay", tryPlay, { once: true });
         }
       } else if (isNeighbor) {
-        // Pre-buffer the adjacent slide so it's ready instantly
+        // Pre-buffer adjacent slide so it's ready instantly
         v.preload = "auto";
         v.pause();
       } else {
@@ -452,7 +442,7 @@ function openVideoLightbox(idx) {
   const v = realVideos()[idx];
   const vid = $("videoLightboxVid");
 
-  // Remove any previous stall handler from earlier lightbox open
+  // Remove any previous stall handler
   if (vid._stallHandler) {
     vid.removeEventListener("waiting", vid._stallHandler);
     vid.removeEventListener("stalled", vid._stallHandler);
@@ -466,17 +456,11 @@ function openVideoLightbox(idx) {
 
   const tryPlay = () => vid.play().catch(() => {});
 
-  // Re-try on any buffer stall — keeps full-screen video running smoothly
   vid._stallHandler = () => setTimeout(tryPlay, 300);
   vid.addEventListener("waiting", vid._stallHandler);
   vid.addEventListener("stalled", vid._stallHandler);
 
-  if (vid.readyState >= 2) {
-    tryPlay();
-  } else {
-    vid.addEventListener("canplay", tryPlay, { once: true });
-    vid.addEventListener("error", () => console.error("Lightbox video load error"), { once: true });
-  }
+  vid.addEventListener("canplay", tryPlay, { once: true });
 
   $("videoLightboxCounter").textContent = `${idx + 1} / ${realVideos().length}`;
   $("videoLightbox").hidden = false;

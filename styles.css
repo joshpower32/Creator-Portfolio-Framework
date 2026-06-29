@@ -139,7 +139,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 .lightbox { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; }
 .lightbox[hidden] { display: none; }
 .lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.93); backdrop-filter: blur(6px); }
-.lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.08); border: 1px solid var(--line); color: var(--ink); width: 44px; height: 44px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; z-index: 1; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.08); border: 1px solid var(--line); color: var(--ink); width: 44px; height: 44px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .lightbox-close:hover { background: var(--brand); border-color: var(--brand); }
 .lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: 1px solid var(--brand); color: var(--brand); width: 50px; height: 50px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; z-index: 3; display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .lightbox-prev:hover, .lightbox-next:hover { background: var(--brand); color: #fff; }
