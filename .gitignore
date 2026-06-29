@@ -1,0 +1,6 @@
+node_modules/
+assets/videos/
+assets/posters/
+assets/photos/
+package-lock.json
+.env

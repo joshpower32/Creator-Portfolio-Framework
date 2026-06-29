@@ -25,31 +25,18 @@ const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
 const VIDEO_IDS = [
   27588385, 27588382,  // slide 1  — yellow bikini babe
-  26889136, 31223573,  // slide 2
-  30744225, 16093155,  // slide 3
-  28879318, 28879306,  // slide 4
-  31223581, 27588390,  // slide 5
-  27588431, 27588419,  // slide 6
-  27588427, 27588421,  // slide 7  — brunette red bikini bike helmet
-  17147599, 17147597,  // slide 8  — blonde white angel
-  27179500, 27179497,  // slide 9  — red lover girl
-  36330963, 36330925,  // slide 10 — blonde babe white and black
-  35687398, 35673132,  // slide 11 — white bikini bouncy babe
-  27588426, 27588422,  // slide 13 — curvy blonde bouncing beauty
-  8733251,  8746841,   // slide 14 — brunette red sheet 1
-  8746336,  8746847,   // slide 16 — brunette red sheet 2
-  27588384, 27588393,  // slide 17 — latina
-  35673203, 35454852,  // slide 18 — white bikini adorable
-  30744218, 27989385,  // slide 19 — wet and black lingerie
-  27588411, 27588410,  // slide 20 — painting hottie
-  27588416, 27588419,  // slide 21 — 2 thick babes
-  27588413, 36330924,  // slide 22
-  27179741, 27588418,  // slide 23
+  30744225, 16093155,  // slide 2
+  28879318, 28879306,  // slide 3
+  8746336,  8746847,   // slide 4  — brunette red sheet 2
+  35673203, 35454852,  // slide 5  — white bikini adorable
+  30744218, 27989385,  // slide 6  — wet and black lingerie
+  27588411, 27588410,  // slide 7  — painting hottie
+  27588416, 27588419,  // slide 8  — 2 thick babes
 ];
-const VID_CACHE_KEY = "creator_vidcache_v12";
+const VID_CACHE_KEY = "creator_vidcache_v15";
 
-// Set true after hosting assets externally (CDN/S3) — see scripts/download-assets.js
-const USE_LOCAL_ASSETS = false;
+const USE_LOCAL_ASSETS = true;
+const CDN_BASE = "https://pub-90343f1a234549689c19246f72b2487c.r2.dev";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -280,8 +267,8 @@ function getBestVideoSrc(v) {
 async function loadVideos() {
   if (USE_LOCAL_ASSETS) {
     galleryVideos = VIDEO_IDS.map(id => ({
-      video_files: [{ link: `assets/videos/${id}.mp4`, file_type: "video/mp4", quality: "hd", width: 1920, height: 1080 }],
-      image: `assets/posters/${id}.jpg`,
+      video_files: [{ link: `${CDN_BASE}/videos/${id}.mp4`, file_type: "video/mp4", quality: "hd", width: 1920, height: 1080 }],
+      image: `${CDN_BASE}/posters/${id}.jpg`,
     }));
     renderVideoGallery();
     renderVideoDots();
