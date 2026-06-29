@@ -26,7 +26,7 @@ const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 const VIDEO_IDS = [
   27588385, 27588382,  // slide 1  — yellow bikini babe
   26889136, 31223573,  // slide 2
-  27259483, 27259473,  // slide 3
+  30744225, 16093155,  // slide 3
   28879318, 28879306,  // slide 4
   31223581, 27588390,  // slide 5
   27588431, 27588419,  // slide 6
@@ -40,13 +40,13 @@ const VIDEO_IDS = [
   8746336,  8746847,   // slide 16 — brunette red sheet 2
   27588384, 27588393,  // slide 17 — latina
   35673203, 35454852,  // slide 18 — white bikini adorable
-  30744218, 28879318,  // slide 19 — wet and black lingerie
+  30744218, 27989385,  // slide 19 — wet and black lingerie
   27588411, 27588410,  // slide 20 — painting hottie
   27588416, 27588419,  // slide 21 — 2 thick babes
   27588413, 36330924,  // slide 22
   27179741, 27588418,  // slide 23
 ];
-const VID_CACHE_KEY = "creator_vidcache_v11";
+const VID_CACHE_KEY = "creator_vidcache_v12";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
