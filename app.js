@@ -358,32 +358,37 @@ function playCurrentVideoSlide() {
       const isCurrent = i === currentVideoSlide + 1;
       const isNeighbor = Math.abs(i - (currentVideoSlide + 1)) === 1;
 
-      // Clean up stall handler whenever the role changes
+      // Always clean up previous handlers before reassigning
       if (v._stallHandler) {
         v.removeEventListener("waiting", v._stallHandler);
         v.removeEventListener("stalled", v._stallHandler);
         v._stallHandler = null;
       }
+      if (v._canplayHandler) {
+        v.removeEventListener("canplay", v._canplayHandler);
+        v._canplayHandler = null;
+      }
 
       if (isCurrent) {
         v.preload = "auto";
         const tryPlay = () => v.play().catch(() => {});
-        // Re-try on any buffer stall so the video keeps running
         v._stallHandler = () => setTimeout(tryPlay, 300);
         v.addEventListener("waiting", v._stallHandler);
         v.addEventListener("stalled", v._stallHandler);
-        if (v.readyState >= 2) {
+
+        if (!v.paused) {
+          // Already playing — leave it alone
+        } else if (v.readyState >= 2) {
+          // Loaded and paused — just play
           tryPlay();
         } else {
-          // Register listener BEFORE load() so we never miss the event
-          v.addEventListener("canplay", tryPlay, { once: true });
-          // readyState 0 = HAVE_NOTHING — browser hasn't fetched anything yet
-          // (happens when preload="none" was set). Must call load() explicitly
-          // or the browser won't start downloading even after preload="auto".
-          if (v.readyState === 0) v.load();
+          // Not loaded yet — mirror exactly what the lightbox does:
+          // register canplay listener first, then call load()
+          v._canplayHandler = tryPlay;
+          v.addEventListener("canplay", v._canplayHandler, { once: true });
+          v.load();
         }
       } else if (isNeighbor) {
-        // Pre-buffer adjacent slide so it's ready instantly
         v.preload = "auto";
         v.pause();
       } else {
