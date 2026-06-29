@@ -23,6 +23,14 @@ const GALLERY_IDS = [
 const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
+const VIDEO_IDS = [
+  36330964, 8431520, 36330966, 3841358, 19886272,
+  6568266,  7571413, 8732392,  8746847, 8733251,
+  8746336,  8746841, 8056089,  36330965, 6646601,
+  6762994,  8348817, 36082685,
+];
+const VID_CACHE_KEY = "creator_vidcache_v1";
+
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
@@ -191,22 +199,32 @@ let currentVideoSlide = 0;
 
 function videoSlideCount() { return Math.max(1, Math.ceil(galleryVideos.length / 2)); }
 
-function getBestVideoSrc(v) {
+function getBestVideoSrc(v, quality = "hd") {
   const files = (v.video_files || []).filter(f => f.file_type === "video/mp4");
   const portrait = files.filter(f => f.height >= f.width);
   const pool = portrait.length ? portrait : files;
+  if (quality === "sd") {
+    return (pool.find(f => f.quality === "sd") || pool.find(f => f.quality === "hd") || pool[0])?.link || "";
+  }
   return (pool.find(f => f.quality === "hd") || pool.find(f => f.quality === "sd") || pool[0])?.link || "";
 }
 
 async function loadVideos() {
+  let vidCache = JSON.parse(localStorage.getItem(VID_CACHE_KEY) || "{}");
   try {
-    const res = await fetch(
-      `https://api.pexels.com/videos/search?query=woman+fashion+model&per_page=10&orientation=portrait`,
-      { headers: { Authorization: CONFIG.pexelsKey } }
-    );
-    if (!res.ok) return;
-    const data = await res.json();
-    let videos = (data.videos || []).filter(v => getBestVideoSrc(v));
+    const fetched = await Promise.all(VIDEO_IDS.map(async (id) => {
+      if (vidCache[id]) return vidCache[id];
+      try {
+        const res = await fetch(`https://api.pexels.com/videos/videos/${id}`,
+          { headers: { Authorization: CONFIG.pexelsKey } });
+        if (!res.ok) return null;
+        const v = await res.json();
+        vidCache[id] = v;
+        return v;
+      } catch { return null; }
+    }));
+    localStorage.setItem(VID_CACHE_KEY, JSON.stringify(vidCache));
+    let videos = fetched.filter(v => v && getBestVideoSrc(v, "sd"));
     if (videos.length % 2 !== 0 && videos.length > 1) videos = videos.slice(0, videos.length - 1);
     galleryVideos = videos;
     renderVideoGallery();
@@ -224,12 +242,13 @@ function renderVideoGallery() {
     const v1 = galleryVideos[i];
     const v2 = galleryVideos[i + 1];
     slides.push(`<div class="gallery-slide">
-      <video src="${esc(getBestVideoSrc(v1))}" autoplay muted loop playsinline preload="metadata" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
-      ${v2 ? `<video src="${esc(getBestVideoSrc(v2))}" autoplay muted loop playsinline preload="metadata" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
+      <video src="${esc(getBestVideoSrc(v1, 'sd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
+      ${v2 ? `<video src="${esc(getBestVideoSrc(v2, 'sd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
     </div>`);
   }
   grid.innerHTML = slides.join("");
   updateVideoScroll();
+  playCurrentVideoSlide();
 }
 
 function updateVideoScroll() {
@@ -243,10 +262,21 @@ function renderVideoDots() {
   ).join("");
 }
 
+function playCurrentVideoSlide() {
+  const slides = $("videoGrid").querySelectorAll(".gallery-slide");
+  slides.forEach((slide, i) => {
+    slide.querySelectorAll("video").forEach(v => {
+      if (i === currentVideoSlide) { v.play().catch(() => {}); }
+      else { v.pause(); }
+    });
+  });
+}
+
 function setVideoSlide(i) {
   currentVideoSlide = Math.max(0, Math.min(i, videoSlideCount() - 1));
   updateVideoScroll();
   renderVideoDots();
+  playCurrentVideoSlide();
 }
 
 function videoPrev() { setVideoSlide(currentVideoSlide - 1); }
@@ -254,7 +284,7 @@ function videoNext() { setVideoSlide(currentVideoSlide + 1); }
 
 function openVideoLightbox(idx) {
   const v = galleryVideos[idx];
-  $("videoLightboxSrc").src = getBestVideoSrc(v);
+  $("videoLightboxSrc").src = getBestVideoSrc(v, "hd");
   const vid = $("videoLightboxVid");
   vid.load();
   vid.play().catch(() => {});
@@ -267,6 +297,7 @@ function closeVideoLightbox() {
   $("videoLightboxSrc").src = "";
   $("videoLightbox").hidden = true;
   document.body.style.overflow = "";
+  playCurrentVideoSlide();
 }
 
 $("videoPrev").addEventListener("click", videoPrev);
