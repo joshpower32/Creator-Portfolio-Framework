@@ -26,24 +26,25 @@ const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 const VIDEO_IDS = [
   36330964, 36330966,  // slide 1
   35673203, 35454852,  // slide 2
-  6568266,  6646601,   // slide 3
+  27588384, 27588393,  // slide 3 (replaced)
   8746336,  8746847,   // slide 4
-  8733251,  8746841,   // slide 5
-  27588426, 27588422,  // slide 6
-  36330965, 33790700,  // slide 7
-  8348877,  8348817,   // slide 8
-  8907517,  16008307,  // slide 9
-  27588428, 27179740,  // slide 10
-  35687398, 35673132,  // slide 11
-  36330963, 36330925,  // slide 12
-  31223590, 31223592,  // slide 13
-  31223573, 31223570,  // slide 14
-  30744236, 30744237,  // slide 15
-  30744218, 28879318,  // slide 16
-  27588411, 27588410,  // slide 17
-  27588416, 27588419,  // slide 18
+  7058608,  7057796,   // slide 5 (new)
+  8733251,  8746841,   // slide 6 (was 5)
+  27588426, 27588422,  // slide 7 (was 6)
+  36330965, 33790700,  // slide 8 (was 7)
+  8348877,  8348817,   // slide 9 (was 8)
+  8907517,  16008307,  // slide 10 (was 9)
+  27588428, 27179740,  // slide 11 (was 10)
+  35687398, 35673132,  // slide 12 (was 11)
+  36330963, 36330925,  // slide 13 (was 12)
+  31223590, 31223592,  // slide 14 (was 13)
+  31223573, 31223570,  // slide 15 (was 14)
+  30744236, 30744237,  // slide 16 (was 15)
+  30744218, 28879318,  // slide 17 (was 16)
+  27588411, 27588410,  // slide 18 (was 17)
+  27588416, 27588419,  // slide 19 (was 18)
 ];
-const VID_CACHE_KEY = "creator_vidcache_v4";
+const VID_CACHE_KEY = "creator_vidcache_v5";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
