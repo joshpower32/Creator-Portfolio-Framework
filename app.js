@@ -273,8 +273,11 @@ function getBestVideoSrc(v, quality = "hd") {
   const pool = portrait.length ? portrait : files;
   // Sort highest resolution first so we always pick the sharpest available file
   const byRes = [...pool].sort((a, b) => (b.width * b.height) - (a.width * a.height));
-  if (quality === "sd") {
-    // Only use SD if it's at least 400px on the short side — otherwise HD looks far better
+  // Drop to SD on slow/metered connections to prevent buffering
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const slowConn = conn && (conn.saveData || conn.effectiveType === "2g" || conn.effectiveType === "slow-2g");
+  const target = slowConn ? "sd" : quality;
+  if (target === "sd") {
     const sd = byRes.find(f => f.quality === "sd" && Math.min(f.width, f.height) >= 400);
     return (sd || byRes.find(f => f.quality === "hd") || byRes[0])?.link || "";
   }
@@ -363,7 +366,7 @@ function playCurrentVideoSlide() {
         v.preload = "auto";
         v.play().catch(() => {});
       } else if (Math.abs(i - (currentVideoSlide + 1)) === 1) {
-        v.preload = "metadata";
+        v.preload = "auto";
         v.pause();
       } else {
         v.preload = "none";
@@ -625,7 +628,7 @@ new IntersectionObserver(([entry]) => {
   } else {
     videos.forEach(v => { v.pause(); v.preload = "none"; });
   }
-}, { threshold: 0.1 }).observe(document.getElementById("videos"));
+}, { threshold: 0 }).observe(document.getElementById("videos"));
 
 // --- Init ---
 loadGalleryImages();
