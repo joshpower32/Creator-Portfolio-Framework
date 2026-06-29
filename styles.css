@@ -78,7 +78,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 
 /* ---------- Hero ---------- */
 .hero { position: relative; padding: 120px 0 80px; overflow: hidden; }
-.hero-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); background-size: cover; background-position: center; z-index: 0; }
+.hero-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); background-size: cover; background-position: top center; z-index: 0; }
 .hero-bg::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.6); z-index: 1; }
 .hero-inner { position: relative; z-index: 2; max-width: 700px; }
 .hero-content h1 { font-size: clamp(2.4rem, 8vw, 4.2rem); margin: 0 0 .5rem; background: linear-gradient(135deg, var(--ink), var(--brand)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -142,7 +142,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 .lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.93); backdrop-filter: blur(6px); }
 .lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.08); border: 1px solid var(--line); color: var(--ink); width: 44px; height: 44px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; z-index: 1; display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .lightbox-close:hover { background: var(--brand); border-color: var(--brand); }
-.lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: 1px solid var(--brand); color: var(--brand); width: 50px; height: 50px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; z-index: 1; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.lightbox-prev, .lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: 1px solid var(--brand); color: var(--brand); width: 50px; height: 50px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; z-index: 3; display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .lightbox-prev:hover, .lightbox-next:hover { background: var(--brand); color: #fff; }
 .lightbox-prev { left: 20px; }
 .lightbox-next { right: 20px; }

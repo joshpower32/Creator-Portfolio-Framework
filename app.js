@@ -61,7 +61,7 @@ let galleryPhotos = [];
 let currentSlide = 0;       // which 2-photo slide is showing
 let lightboxIdx = 0;        // which individual photo is in the lightbox
 const GALLERY_TARGET = 14;  // matches verified IDs — fallback only fires on genuine load failures
-const IMG_CACHE_KEY = "creator_imgcache_v9";
+const IMG_CACHE_KEY = "creator_imgcache_v10";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // --- Load gallery: hardcoded IDs + fallback fill ---
@@ -434,7 +434,7 @@ async function loadHeroBg() {
       { headers: { Authorization: CONFIG.pexelsKey } });
     if (!res.ok) return;
     const data = await res.json();
-    const url = data.src.landscape;
+    const url = data.src.large;
     imgCache[cacheKey] = { url };
     localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
     el.style.backgroundImage = `url("${url}")`;
