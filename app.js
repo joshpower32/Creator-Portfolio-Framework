@@ -24,27 +24,29 @@ const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
 const VIDEO_IDS = [
-  36330964, 36330966,  // slide 1
-  35673203, 35454852,  // slide 2
-  27588384, 27588393,  // slide 3 (replaced)
-  8746336,  8746847,   // slide 4
-  7058608,  7057796,   // slide 5 (new)
-  8733251,  8746841,   // slide 6 (was 5)
-  27588426, 27588422,  // slide 7 (was 6)
-  36330965, 33790700,  // slide 8 (was 7)
-  8348877,  8348817,   // slide 9 (was 8)
-  8907517,  16008307,  // slide 10 (was 9)
-  27588428, 27179740,  // slide 11 (was 10)
-  35687398, 35673132,  // slide 12 (was 11)
-  36330963, 36330925,  // slide 13 (was 12)
-  31223590, 31223592,  // slide 14 (was 13)
-  31223573, 31223570,  // slide 15 (was 14)
-  30744236, 30744237,  // slide 16 (was 15)
-  30744218, 28879318,  // slide 17 (was 16)
-  27588411, 27588410,  // slide 18 (was 17)
-  27588416, 27588419,  // slide 19 (was 18)
+  27588385, 27588382,  // slide 1  — yellow bikini babe
+  26889136, 27588388,  // slide 2
+  36330926, 36330923,  // slide 3
+  27588382, 27588431,  // slide 4
+  31223581, 27588390,  // slide 5
+  27588430, 27588419,  // slide 6
+  27588427, 27588421,  // slide 7  — brunette red bikini bike helmet
+  17147599, 17147597,  // slide 8  — blonde white angel
+  27179500, 27179497,  // slide 9  — red lover girl
+  36330963, 36330925,  // slide 10 — blonde babe white and black
+  35687398, 35673132,  // slide 11 — white bikini bouncy babe
+  27588426, 27588422,  // slide 13 — curvy blonde bouncing beauty
+  8733251,  8746841,   // slide 14 — brunette red sheet 1
+  8746336,  8746847,   // slide 16 — brunette red sheet 2
+  27588384, 27588393,  // slide 17 — latina
+  35673203, 35454852,  // slide 18 — white bikini adorable
+  30744218, 28879318,  // slide 19 — wet and black lingerie
+  27588411, 27588410,  // slide 20 — painting hottie
+  27588416, 27588419,  // slide 21 — 2 thick babes
+  27588413, 36330924,  // slide 22
+  27179741, 27588418,  // slide 23
 ];
-const VID_CACHE_KEY = "creator_vidcache_v5";
+const VID_CACHE_KEY = "creator_vidcache_v6";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
