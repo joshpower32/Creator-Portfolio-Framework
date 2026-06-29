@@ -24,27 +24,26 @@ const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
 const VIDEO_IDS = [
-  36330964, 36330966,   // slide 1  ✅ good pair
-  37274908, 19886272,   // slide 2  (noted, unchanged for now)
-  6568266,  6646601,    // slide 3  ✅ good pair
-  8746336,  8746847,    // slide 4  — user: pair 8746336 with 8746847
-  8733251,  8746841,    // slide 5  — user: pair 8733251 with 8746841
-  27588426, 8056089,    // slide 6  — orphaned, paired together
-  36330965, null,       // slide 7  — solo, right slot blank (fill later)
-  8348877,  8348817,    // slide 8  — user: pair these two
-  36082685, 16008307,   // slide 9
-  8331896,  35454852,   // slide 10 — 8331896 orphaned
-  35687398, 35673132,   // slide 11
-  27588416, 36330963,   // slide 12
-  36330925, 31223590,   // slide 13
-  31223592, 31223573,   // slide 14
-  31223570, 30744236,   // slide 15
-  30744237, 30744218,   // slide 16
-  27588411, 27588410,   // slide 17 ✅ paired per request
-  28879318, 28879305,   // slide 18
-  27588418, 27588419,   // slide 19
+  36330964, 36330966,  // slide 1
+  35673203, 35454852,  // slide 2
+  6568266,  6646601,   // slide 3
+  8746336,  8746847,   // slide 4
+  8733251,  8746841,   // slide 5
+  27588426, 27588422,  // slide 6
+  36330965, 33790700,  // slide 7
+  8348877,  8348817,   // slide 8
+  8907517,  16008307,  // slide 9
+  27588428, 27179740,  // slide 10
+  35687398, 35673132,  // slide 11
+  36330963, 36330925,  // slide 12
+  31223590, 31223592,  // slide 13
+  31223573, 31223570,  // slide 14
+  30744236, 30744237,  // slide 15
+  30744218, 28879318,  // slide 16
+  27588411, 27588410,  // slide 17
+  27588416, 27588419,  // slide 18
 ];
-const VID_CACHE_KEY = "creator_vidcache_v3";
+const VID_CACHE_KEY = "creator_vidcache_v4";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -127,7 +126,7 @@ function slideCount() { return Math.max(1, Math.ceil(galleryPhotos.length / 2));
 function renderGallery() {
   const grid = $("galleryGrid");
   const sc = slideCount();
-  const total = sc + 1; // +1 clone of slide 0 at the end for infinite wrap
+  const total = sc + 2; // clone of last prepended + clone of first appended
   grid.style.width = `${total * 100}%`;
   grid.style.setProperty("--slide-count", total);
 
@@ -140,20 +139,20 @@ function renderGallery() {
       ${p2 ? `<img src="${esc(p2.src.large)}" alt="Photo ${i + 2}" loading="lazy" onclick="openLightbox(${i + 1})" title="Click to view full size">` : ""}
     </div>`);
   }
-  // Clone of first slide — enables seamless right-wrap
-  if (slides.length) slides.push(slides[0]);
-  grid.innerHTML = slides.join("");
+  // [clone of last] + real slides + [clone of first] = seamless both-direction wrap
+  if (slides.length) grid.innerHTML = [slides[sc - 1], ...slides, slides[0]].join("");
   updateGalleryScroll();
 }
 
 function updateGalleryScroll() {
-  const total = slideCount() + 1;
-  $("galleryGrid").style.transform = `translateX(${-currentSlide * (100 / total)}%)`;
+  const total = slideCount() + 2;
+  // real slide 0 is at DOM pos 1, so offset by 1
+  $("galleryGrid").style.transform = `translateX(${-(currentSlide + 1) * (100 / total)}%)`;
 }
 
 function renderGalleryDots() {
   const sc = slideCount();
-  const active = currentSlide >= sc ? 0 : currentSlide;
+  const active = ((currentSlide % sc) + sc) % sc;
   $("galleryDots").innerHTML = Array.from({ length: sc }, (_, i) =>
     `<button class="gallery-dot ${i === active ? "active" : ""}" onclick="setSlide(${i})" aria-label="Slide ${i + 1}"></button>`
   ).join("");
@@ -165,23 +164,37 @@ function setSlide(i) {
   renderGalleryDots();
 }
 
-function galleryPrev() { setSlide(currentSlide - 1); }
+function galleryPrev() {
+  const sc = slideCount();
+  if (currentSlide <= 0) {
+    const grid = $("galleryGrid");
+    // Animate left to clone of last (DOM pos 0 = translateX 0%)
+    currentSlide = sc - 1;
+    renderGalleryDots();
+    grid.style.transform = `translateX(0%)`;
+    setTimeout(() => {
+      grid.style.transition = "none";
+      updateGalleryScroll(); // snap to real last slide
+      requestAnimationFrame(() => requestAnimationFrame(() => { grid.style.transition = ""; }));
+    }, 420);
+  } else {
+    setSlide(currentSlide - 1);
+  }
+}
+
 function galleryNext() {
   const sc = slideCount();
   if (currentSlide >= sc - 1) {
-    // Animate into the clone, then snap back to real slide 0
-    currentSlide = sc;
-    updateGalleryScroll();
+    const grid = $("galleryGrid");
+    const total = sc + 2;
+    // Animate right to clone of first (DOM pos sc+1)
+    currentSlide = 0;
     renderGalleryDots();
+    grid.style.transform = `translateX(${-((sc + 1) / total) * 100}%)`;
     setTimeout(() => {
-      const grid = $("galleryGrid");
       grid.style.transition = "none";
-      currentSlide = 0;
-      updateGalleryScroll();
-      renderGalleryDots();
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        grid.style.transition = "";
-      }));
+      updateGalleryScroll(); // snap to real first slide
+      requestAnimationFrame(() => requestAnimationFrame(() => { grid.style.transition = ""; }));
     }, 420);
   } else {
     setSlide(currentSlide + 1);
@@ -277,11 +290,10 @@ async function loadVideos() {
 function renderVideoGallery() {
   const grid = $("videoGrid");
   const sc = videoSlideCount();
-  const total = sc + 1;
+  const total = sc + 2;
   grid.style.width = `${total * 100}%`;
   grid.style.setProperty("--slide-count", total);
   const slides = [];
-  // Track real video index separately (blanks don't count for lightbox idx)
   let vidIdx = 0;
   for (let i = 0; i < galleryVideos.length; i += 2) {
     const v1 = galleryVideos[i];
@@ -296,20 +308,20 @@ function renderVideoGallery() {
       `<video src="${esc(getBestVideoSrc(v2, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" title="Click to watch full screen"></video>`;
     slides.push(`<div class="gallery-slide">${slot1}${slot2}</div>`);
   }
-  if (slides.length) slides.push(slides[0]);
-  grid.innerHTML = slides.join("");
+  // [clone of last] + real slides + [clone of first]
+  if (slides.length) grid.innerHTML = [slides[sc - 1], ...slides, slides[0]].join("");
   updateVideoScroll();
   playCurrentVideoSlide();
 }
 
 function updateVideoScroll() {
-  const total = videoSlideCount() + 1;
-  $("videoGrid").style.transform = `translateX(${-currentVideoSlide * (100 / total)}%)`;
+  const total = videoSlideCount() + 2;
+  $("videoGrid").style.transform = `translateX(${-(currentVideoSlide + 1) * (100 / total)}%)`;
 }
 
 function renderVideoDots() {
   const sc = videoSlideCount();
-  const active = currentVideoSlide >= sc ? 0 : currentVideoSlide;
+  const active = ((currentVideoSlide % sc) + sc) % sc;
   $("videoDots").innerHTML = Array.from({ length: sc }, (_, i) =>
     `<button class="gallery-dot ${i === active ? "active" : ""}" onclick="setVideoSlide(${i})" aria-label="Video slide ${i + 1}"></button>`
   ).join("");
@@ -317,13 +329,14 @@ function renderVideoDots() {
 
 function playCurrentVideoSlide() {
   const slides = $("videoGrid").querySelectorAll(".gallery-slide");
+  // +1 offset because DOM position 0 is the clone of last
   slides.forEach((slide, i) => {
     slide.querySelectorAll("video").forEach(v => {
-      if (i === currentVideoSlide) {
+      if (i === currentVideoSlide + 1) {
         v.preload = "auto";
         v.play().catch(() => {});
-      } else if (Math.abs(i - currentVideoSlide) === 1) {
-        v.preload = "metadata"; // prime neighbours so next/prev starts instantly
+      } else if (Math.abs(i - (currentVideoSlide + 1)) === 1) {
+        v.preload = "metadata";
         v.pause();
       } else {
         v.preload = "none";
@@ -340,24 +353,37 @@ function setVideoSlide(i) {
   playCurrentVideoSlide();
 }
 
-function videoPrev() { setVideoSlide(currentVideoSlide - 1); }
+function videoPrev() {
+  const sc = videoSlideCount();
+  if (currentVideoSlide <= 0) {
+    const grid = $("videoGrid");
+    currentVideoSlide = sc - 1;
+    renderVideoDots();
+    grid.style.transform = `translateX(0%)`;
+    setTimeout(() => {
+      grid.style.transition = "none";
+      updateVideoScroll();
+      playCurrentVideoSlide();
+      requestAnimationFrame(() => requestAnimationFrame(() => { grid.style.transition = ""; }));
+    }, 420);
+  } else {
+    setVideoSlide(currentVideoSlide - 1);
+  }
+}
+
 function videoNext() {
   const sc = videoSlideCount();
   if (currentVideoSlide >= sc - 1) {
-    currentVideoSlide = sc;
-    updateVideoScroll();
+    const grid = $("videoGrid");
+    const total = sc + 2;
+    currentVideoSlide = 0;
     renderVideoDots();
-    playCurrentVideoSlide();
+    grid.style.transform = `translateX(${-((sc + 1) / total) * 100}%)`;
     setTimeout(() => {
-      const grid = $("videoGrid");
       grid.style.transition = "none";
-      currentVideoSlide = 0;
       updateVideoScroll();
-      renderVideoDots();
       playCurrentVideoSlide();
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        grid.style.transition = "";
-      }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { grid.style.transition = ""; }));
     }, 420);
   } else {
     setVideoSlide(currentVideoSlide + 1);
