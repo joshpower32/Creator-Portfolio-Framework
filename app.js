@@ -585,6 +585,16 @@ function toast(msg) {
   }, 3500);
 }
 
+// Pause/resume gallery videos based on section visibility — saves bandwidth and CPU
+new IntersectionObserver(([entry]) => {
+  const videos = $("videoGrid")?.querySelectorAll("video") || [];
+  if (entry.isIntersecting) {
+    playCurrentVideoSlide();
+  } else {
+    videos.forEach(v => { v.pause(); v.preload = "none"; });
+  }
+}, { threshold: 0.1 }).observe(document.getElementById("videos"));
+
 // --- Init ---
 loadGalleryImages();
 loadVideos();

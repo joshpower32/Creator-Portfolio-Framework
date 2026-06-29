@@ -115,9 +115,9 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 .gallery-grid { display: flex; transition: transform .4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 /* Each slide = 1/N of grid = exactly 1 viewport width */
 .gallery-slide { flex: 0 0 calc(100% / var(--slide-count, 1)); display: flex; gap: 12px; box-sizing: border-box; }
-.gallery-slide img { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: 620px; object-fit: contain; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: border-color .2s ease, border-width .2s ease; display: block; }
+.gallery-slide img { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: clamp(300px, 58vh, 520px); object-fit: contain; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: border-color .2s ease, border-width .2s ease; display: block; }
 .gallery-slide img:hover { border-color: #ff1aff; border-width: 3px; }
-.gallery-slide video { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: 620px; object-fit: cover; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: border-color .2s ease, border-width .2s ease; display: block; }
+.gallery-slide video { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); height: clamp(300px, 58vh, 520px); object-fit: cover; background: #0a0a0a; border-radius: var(--radius); border: 2px solid var(--brand); cursor: pointer; transition: border-color .2s ease, border-width .2s ease; display: block; }
 .gallery-slide video:hover { border-color: #ff1aff; border-width: 3px; }
 @media (max-width: 768px) { .gallery-slide video { height: 340px; } }
 #videoLightboxVid { position: relative; z-index: 1; width: 90vw; height: 90vh; object-fit: cover; border: 2px solid var(--brand); border-radius: var(--radius); }
