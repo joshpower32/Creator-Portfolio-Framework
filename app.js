@@ -275,8 +275,8 @@ function renderVideoGallery() {
     const v1 = galleryVideos[i];
     const v2 = galleryVideos[i + 1];
     slides.push(`<div class="gallery-slide">
-      <video src="${esc(getBestVideoSrc(v1, 'sd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
-      ${v2 ? `<video src="${esc(getBestVideoSrc(v2, 'sd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
+      <video src="${esc(getBestVideoSrc(v1, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
+      ${v2 ? `<video src="${esc(getBestVideoSrc(v2, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
     </div>`);
   }
   if (slides.length) slides.push(slides[0]);
@@ -302,8 +302,16 @@ function playCurrentVideoSlide() {
   const slides = $("videoGrid").querySelectorAll(".gallery-slide");
   slides.forEach((slide, i) => {
     slide.querySelectorAll("video").forEach(v => {
-      if (i === currentVideoSlide) { v.play().catch(() => {}); }
-      else { v.pause(); }
+      if (i === currentVideoSlide) {
+        v.preload = "auto";
+        v.play().catch(() => {});
+      } else if (Math.abs(i - currentVideoSlide) === 1) {
+        v.preload = "metadata"; // prime neighbours so next/prev starts instantly
+        v.pause();
+      } else {
+        v.preload = "none";
+        v.pause();
+      }
     });
   });
 }
