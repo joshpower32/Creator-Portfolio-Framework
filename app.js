@@ -267,21 +267,14 @@ let currentVideoSlide = 0;
 
 function videoSlideCount() { return Math.max(1, Math.ceil(galleryVideos.length / 2)); }
 
-function getBestVideoSrc(v, quality = "hd") {
+function getBestVideoSrc(v) {
   const files = (v.video_files || []).filter(f => f.file_type === "video/mp4");
+  if (!files.length) return "";
+  // Prefer portrait (vertical) files for the gallery display — fall back to all files
   const portrait = files.filter(f => f.height >= f.width);
   const pool = portrait.length ? portrait : files;
-  // Sort highest resolution first so we always pick the sharpest available file
-  const byRes = [...pool].sort((a, b) => (b.width * b.height) - (a.width * a.height));
-  // Drop to SD on slow/metered connections to prevent buffering
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const slowConn = conn && (conn.saveData || conn.effectiveType === "2g" || conn.effectiveType === "slow-2g");
-  const target = slowConn ? "sd" : quality;
-  if (target === "sd") {
-    const sd = byRes.find(f => f.quality === "sd" && Math.min(f.width, f.height) >= 400);
-    return (sd || byRes.find(f => f.quality === "hd") || byRes[0])?.link || "";
-  }
-  return (byRes.find(f => f.quality === "hd") || byRes.find(f => f.quality === "sd") || byRes[0])?.link || "";
+  // Always pick the absolute highest resolution available — no quality downgrade
+  return [...pool].sort((a, b) => (b.width * b.height) - (a.width * a.height))[0]?.link || "";
 }
 
 async function loadVideos() {
@@ -311,7 +304,7 @@ async function loadVideos() {
       } catch { return null; }
     }));
     localStorage.setItem(VID_CACHE_KEY, JSON.stringify(vidCache));
-    galleryVideos = fetched.filter(v => v && (v._blank || getBestVideoSrc(v, "hd")));
+    galleryVideos = fetched.filter(v => v && (v._blank || getBestVideoSrc(v)));
     renderVideoGallery();
     renderVideoDots();
   } catch {}
@@ -333,9 +326,9 @@ function renderVideoGallery() {
     const i2 = vidIdx;
     if (v2 && !v2._blank) vidIdx++;
     const slot1 = v1._blank ? '' :
-      `<video src="${esc(getBestVideoSrc(v1, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i1})" title="Click to watch full screen"></video>`;
+      `<video src="${esc(getBestVideoSrc(v1))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i1})" title="Click to watch full screen"></video>`;
     const slot2 = (!v2 || v2._blank) ? '' :
-      `<video src="${esc(getBestVideoSrc(v2, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" title="Click to watch full screen"></video>`;
+      `<video src="${esc(getBestVideoSrc(v2))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" title="Click to watch full screen"></video>`;
     slides.push(`<div class="gallery-slide">${slot1}${slot2}</div>`);
   }
   // [clone of last] + real slides + [clone of first]
@@ -362,16 +355,40 @@ function playCurrentVideoSlide() {
   // +1 offset because DOM position 0 is the clone of last
   slides.forEach((slide, i) => {
     slide.querySelectorAll("video").forEach(v => {
-      if (i === currentVideoSlide + 1) {
-        v.preload = "auto";
-        // Wait for video to be ready before playing to prevent stopping issues
-        if (v.readyState >= 2) {
-          // HAVE_CURRENT_DATA or better
-          v.play().catch(() => {});
-        } else {
-          v.addEventListener("canplay", () => v.play().catch(() => {}), { once: true });
+      const isCurrent = i === currentVideoSlide + 1;
+      const isNeighbor = Math.abs(i - (currentVideoSlide + 1)) === 1;
+
+      // Always remove old stall handler before reassigning
+      if (v._stallHandler) {
+        v.removeEventListener("waiting", v._stallHandler);
+        v.removeEventListener("stalled", v._stallHandler);
+        v._stallHandler = null;
+      }
+      if (v._canplayHandler) {
+        v.removeEventListener("canplay", v._canplayHandler);
+        v._canplayHandler = null;
+      }
+
+      if (isCurrent) {
+        // Force a load if preload wasn't already active so the browser starts fetching
+        if (v.preload !== "auto") {
+          v.preload = "auto";
+          v.load();
         }
-      } else if (Math.abs(i - (currentVideoSlide + 1)) === 1) {
+        const tryPlay = () => v.play().catch(() => {});
+        // Re-try play on any buffer stall — keeps the video running on slow connections
+        v._stallHandler = () => setTimeout(tryPlay, 300);
+        v.addEventListener("waiting", v._stallHandler);
+        v.addEventListener("stalled", v._stallHandler);
+
+        if (v.readyState >= 2) {
+          tryPlay();
+        } else {
+          v._canplayHandler = tryPlay;
+          v.addEventListener("canplay", v._canplayHandler, { once: true });
+        }
+      } else if (isNeighbor) {
+        // Pre-buffer the adjacent slide so it's ready instantly
         v.preload = "auto";
         v.pause();
       } else {
@@ -434,20 +451,33 @@ function openVideoLightbox(idx) {
   lightboxVideoIdx = idx;
   const v = realVideos()[idx];
   const vid = $("videoLightboxVid");
-  const src = getBestVideoSrc(v, "hd");
+
+  // Remove any previous stall handler from earlier lightbox open
+  if (vid._stallHandler) {
+    vid.removeEventListener("waiting", vid._stallHandler);
+    vid.removeEventListener("stalled", vid._stallHandler);
+    vid._stallHandler = null;
+  }
+
+  const src = getBestVideoSrc(v);
   $("videoLightboxSrc").src = src;
-  vid.load();
-  // Ensure preload is set to auto for smooth playback
   vid.preload = "auto";
-  // Wait a bit for video to start buffering before attempting play
-  setTimeout(() => {
-    if (vid.readyState >= 2) {
-      vid.play().catch(() => {});
-    } else {
-      vid.addEventListener("canplay", () => vid.play().catch(() => {}), { once: true });
-      vid.addEventListener("error", () => console.error("Video load error"), { once: true });
-    }
-  }, 100);
+  vid.load();
+
+  const tryPlay = () => vid.play().catch(() => {});
+
+  // Re-try on any buffer stall — keeps full-screen video running smoothly
+  vid._stallHandler = () => setTimeout(tryPlay, 300);
+  vid.addEventListener("waiting", vid._stallHandler);
+  vid.addEventListener("stalled", vid._stallHandler);
+
+  if (vid.readyState >= 2) {
+    tryPlay();
+  } else {
+    vid.addEventListener("canplay", tryPlay, { once: true });
+    vid.addEventListener("error", () => console.error("Lightbox video load error"), { once: true });
+  }
+
   $("videoLightboxCounter").textContent = `${idx + 1} / ${realVideos().length}`;
   $("videoLightbox").hidden = false;
   document.body.style.overflow = "hidden";
@@ -466,7 +496,13 @@ function videoLightboxNext() {
 }
 
 function closeVideoLightbox() {
-  $("videoLightboxVid").pause();
+  const vid = $("videoLightboxVid");
+  if (vid._stallHandler) {
+    vid.removeEventListener("waiting", vid._stallHandler);
+    vid.removeEventListener("stalled", vid._stallHandler);
+    vid._stallHandler = null;
+  }
+  vid.pause();
   $("videoLightboxSrc").src = "";
   $("videoLightbox").hidden = true;
   document.body.style.overflow = "";
