@@ -177,7 +177,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 /* ---------- Exclusive / Subscription Cards ---------- */
 .exclusive-content { max-width: 1000px; margin: 0 auto; }
 .exclusive-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-.exclusive-card { background: var(--surface); padding: 32px 24px; border-radius: var(--radius); border: 1px solid var(--line); text-align: center; transition: all .2s ease; position: relative; }
+.exclusive-card { background: var(--surface); padding: 32px 24px; border-radius: var(--radius); border: 2px solid var(--brand); text-align: center; transition: all .2s ease; position: relative; }
 .exclusive-card:hover { transform: translateY(-6px); border-color: var(--brand); }
 .exclusive-card.featured { border: 2px solid var(--brand); transform: scale(1.05); }
 .exclusive-card.featured:hover { transform: scale(1.05) translateY(-6px); }
@@ -221,7 +221,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; line-height: 1
 @media (max-width: 480px) {
     .contact-info { grid-template-columns: 1fr; }
 }
-.contact-form { background: var(--surface); padding: 40px; border-radius: var(--radius); border: 1px solid var(--line); }
+.contact-form { background: var(--surface); padding: 40px; border-radius: var(--radius); border: 2px solid var(--brand); }
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--ink); }
 .form-group input,
