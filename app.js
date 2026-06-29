@@ -433,15 +433,21 @@ const realVideos = () => galleryVideos.filter(v => !v._blank);
 function openVideoLightbox(idx) {
   lightboxVideoIdx = idx;
   const v = realVideos()[idx];
-  $("videoLightboxSrc").src = getBestVideoSrc(v, "hd");
   const vid = $("videoLightboxVid");
+  const src = getBestVideoSrc(v, "hd");
+  $("videoLightboxSrc").src = src;
   vid.load();
-  // Wait for video to be ready before playing to prevent playback issues
-  if (vid.readyState >= 2) {
-    vid.play().catch(() => {});
-  } else {
-    vid.addEventListener("canplay", () => vid.play().catch(() => {}), { once: true });
-  }
+  // Ensure preload is set to auto for smooth playback
+  vid.preload = "auto";
+  // Wait a bit for video to start buffering before attempting play
+  setTimeout(() => {
+    if (vid.readyState >= 2) {
+      vid.play().catch(() => {});
+    } else {
+      vid.addEventListener("canplay", () => vid.play().catch(() => {}), { once: true });
+      vid.addEventListener("error", () => console.error("Video load error"), { once: true });
+    }
+  }, 100);
   $("videoLightboxCounter").textContent = `${idx + 1} / ${realVideos().length}`;
   $("videoLightbox").hidden = false;
   document.body.style.overflow = "hidden";
