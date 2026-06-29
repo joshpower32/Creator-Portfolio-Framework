@@ -46,7 +46,7 @@ const VIDEO_IDS = [
   27588413, 36330924,  // slide 22
   27179741, 27588418,  // slide 23
 ];
-const VID_CACHE_KEY = "creator_vidcache_v10";
+const VID_CACHE_KEY = "creator_vidcache_v11";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -259,12 +259,14 @@ function getBestVideoSrc(v, quality = "hd") {
   const files = (v.video_files || []).filter(f => f.file_type === "video/mp4");
   const portrait = files.filter(f => f.height >= f.width);
   const pool = portrait.length ? portrait : files;
+  // Sort highest resolution first so we always pick the sharpest available file
+  const byRes = [...pool].sort((a, b) => (b.width * b.height) - (a.width * a.height));
   if (quality === "sd") {
     // Only use SD if it's at least 400px on the short side — otherwise HD looks far better
-    const sd = pool.find(f => f.quality === "sd" && Math.min(f.width, f.height) >= 400);
-    return (sd || pool.find(f => f.quality === "hd") || pool[0])?.link || "";
+    const sd = byRes.find(f => f.quality === "sd" && Math.min(f.width, f.height) >= 400);
+    return (sd || byRes.find(f => f.quality === "hd") || byRes[0])?.link || "";
   }
-  return (pool.find(f => f.quality === "hd") || pool.find(f => f.quality === "sd") || pool[0])?.link || "";
+  return (byRes.find(f => f.quality === "hd") || byRes.find(f => f.quality === "sd") || byRes[0])?.link || "";
 }
 
 async function loadVideos() {
