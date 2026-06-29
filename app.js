@@ -19,10 +19,6 @@ const GALLERY_IDS = [
   289227,   // overhead pink floor — curly hair
   12642189, // young woman black lace pink bg
   8649515,  // black bob plaid dark interior
-  3622608,  // woman red lingerie dark studio
-  6474818,  // woman pink neon glow
-  8367573,  // dark boudoir silhouette
-  11356381, // sultry editorial — deep red tones
 ];
 const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
@@ -55,8 +51,8 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 let galleryPhotos = [];
 let currentSlide = 0;       // which 2-photo slide is showing
 let lightboxIdx = 0;        // which individual photo is in the lightbox
-const GALLERY_TARGET = 24;  // always aim for an even count = clean slides
-const IMG_CACHE_KEY = "creator_imgcache_v8";
+const GALLERY_TARGET = 14;  // matches verified IDs — fallback only fires on genuine load failures
+const IMG_CACHE_KEY = "creator_imgcache_v9";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // --- Load gallery: hardcoded IDs + fallback fill ---
@@ -83,7 +79,7 @@ async function loadGalleryImages() {
     const existIds = new Set(photos.map(p => p.id));
     try {
       const res = await fetch(
-        `https://api.pexels.com/v1/search?query=boudoir+lingerie+woman&per_page=${need + 4}&orientation=portrait&page=1`,
+        `https://api.pexels.com/v1/search?query=woman+portrait+lingerie+model&per_page=${need + 4}&orientation=portrait&page=1`,
         { headers: { Authorization: CONFIG.pexelsKey } });
       if (res.ok) {
         const data = await res.json();
