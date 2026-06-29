@@ -48,6 +48,9 @@ const VIDEO_IDS = [
 ];
 const VID_CACHE_KEY = "creator_vidcache_v12";
 
+// Set true after hosting assets externally (CDN/S3) — see scripts/download-assets.js
+const USE_LOCAL_ASSETS = false;
+
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
   web3formsKey: "YOUR_WEB3FORMS_ACCESS_KEY",
@@ -82,7 +85,19 @@ let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
 // --- Load gallery: hardcoded IDs + fallback fill ---
 async function loadGalleryImages() {
-  // Fetch each hardcoded ID (use localStorage cache to skip re-fetching)
+  if (USE_LOCAL_ASSETS) {
+    let photos = GALLERY_IDS.map(id => ({
+      id,
+      src: { large: `assets/photos/${id}.jpg`, large2x: `assets/photos/${id}.jpg` },
+    }));
+    if (photos.length % 2 !== 0) photos = photos.slice(0, photos.length - 1);
+    galleryPhotos = photos;
+    renderGallery();
+    renderGalleryDots();
+    return;
+  }
+
+  // Pexels API fallback (used if USE_LOCAL_ASSETS is false)
   const fetched = await Promise.all(GALLERY_IDS.map(async (id) => {
     const cacheKey = "pid_" + id;
     if (imgCache[cacheKey]) return imgCache[cacheKey];
@@ -98,7 +113,6 @@ async function loadGalleryImages() {
 
   let photos = fetched.filter(Boolean);
 
-  // Fill any gaps up to GALLERY_TARGET from a Pexels search
   if (photos.length < GALLERY_TARGET) {
     const need = GALLERY_TARGET - photos.length;
     const existIds = new Set(photos.map(p => p.id));
@@ -114,9 +128,7 @@ async function loadGalleryImages() {
     } catch { /* keep what we have */ }
   }
 
-  // Ensure even count so no half-empty last slide
   if (photos.length % 2 !== 0 && photos.length > 1) photos = photos.slice(0, photos.length - 1);
-
   localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
   galleryPhotos = photos;
   renderGallery();
@@ -270,10 +282,21 @@ function getBestVideoSrc(v, quality = "hd") {
 }
 
 async function loadVideos() {
+  if (USE_LOCAL_ASSETS) {
+    galleryVideos = VIDEO_IDS.map(id => ({
+      video_files: [{ link: `assets/videos/${id}.mp4`, file_type: "video/mp4", quality: "hd", width: 1920, height: 1080 }],
+      image: `assets/posters/${id}.jpg`,
+    }));
+    renderVideoGallery();
+    renderVideoDots();
+    return;
+  }
+
+  // Pexels API fallback
   let vidCache = JSON.parse(localStorage.getItem(VID_CACHE_KEY) || "{}");
   try {
     const fetched = await Promise.all(VIDEO_IDS.map(async (id) => {
-      if (id === null) return { _blank: true }; // explicit blank slot
+      if (id === null) return { _blank: true };
       if (vidCache[id]) return vidCache[id];
       try {
         const res = await fetch(`https://api.pexels.com/videos/videos/${id}`,
@@ -285,7 +308,6 @@ async function loadVideos() {
       } catch { return null; }
     }));
     localStorage.setItem(VID_CACHE_KEY, JSON.stringify(vidCache));
-    // Keep blank sentinels; drop failed fetches. No even-trim — pairing is explicit.
     galleryVideos = fetched.filter(v => v && (v._blank || getBestVideoSrc(v, "hd")));
     renderVideoGallery();
     renderVideoDots();
@@ -470,6 +492,12 @@ function renderProducts() {
 // --- Load about photo ---
 async function loadAboutPhoto() {
   const el = $("aboutImage");
+  if (USE_LOCAL_ASSETS) {
+    el.style.backgroundImage = `url("assets/photos/${ABOUT_PHOTO_ID}.jpg")`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center top";
+    return;
+  }
   const cacheKey = "__about";
   const cached = imgCache[cacheKey]?.url;
   if (cached) { el.style.backgroundImage = `url("${cached}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; return; }
@@ -490,6 +518,10 @@ async function loadAboutPhoto() {
 // --- Load hero background ---
 async function loadHeroBg() {
   const el = $("heroBg");
+  if (USE_LOCAL_ASSETS) {
+    el.style.backgroundImage = `url("assets/photos/${HERO_PHOTO_ID}.jpg")`;
+    return;
+  }
   const cacheKey = "__hero";
   const cached = imgCache[cacheKey]?.url;
   if (cached) { el.style.backgroundImage = `url("${cached}")`; return; }
