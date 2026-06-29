@@ -364,7 +364,13 @@ function playCurrentVideoSlide() {
     slide.querySelectorAll("video").forEach(v => {
       if (i === currentVideoSlide + 1) {
         v.preload = "auto";
-        v.play().catch(() => {});
+        // Wait for video to be ready before playing to prevent stopping issues
+        if (v.readyState >= 2) {
+          // HAVE_CURRENT_DATA or better
+          v.play().catch(() => {});
+        } else {
+          v.addEventListener("canplay", () => v.play().catch(() => {}), { once: true });
+        }
       } else if (Math.abs(i - (currentVideoSlide + 1)) === 1) {
         v.preload = "auto";
         v.pause();
@@ -430,7 +436,12 @@ function openVideoLightbox(idx) {
   $("videoLightboxSrc").src = getBestVideoSrc(v, "hd");
   const vid = $("videoLightboxVid");
   vid.load();
-  vid.play().catch(() => {});
+  // Wait for video to be ready before playing to prevent playback issues
+  if (vid.readyState >= 2) {
+    vid.play().catch(() => {});
+  } else {
+    vid.addEventListener("canplay", () => vid.play().catch(() => {}), { once: true });
+  }
   $("videoLightboxCounter").textContent = `${idx + 1} / ${realVideos().length}`;
   $("videoLightbox").hidden = false;
   document.body.style.overflow = "hidden";
