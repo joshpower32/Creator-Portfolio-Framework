@@ -24,27 +24,27 @@ const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
 const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
 
 const VIDEO_IDS = [
-  36330964, 36330966,  // panel 1
-  37274908, 19886272,  // panel 2
-  6568266,  6646601,   // panel 3 — paired per request
-  27588426, 8746847,   // panel 4
-  8733251,  8746336,   // panel 5
-  8746841,  8056089,   // panel 6
-  36330965, 8348817,   // panel 7
-  36082685, 16008307,  // panel 8
-  8348877,  8331896,   // panel 9
-  35454852, 35687398,  // panel 10
-  35673132, 27588416,  // panel 11
-  36330963, 36330925,  // panel 12
-  31223590, 31223592,  // panel 13
-  31223573, 31223570,  // panel 14
-  30744236, 30744237,  // panel 15
-  30744218, 28879318,  // panel 16
-  27588411, 27588410,  // panel 17 — paired per request
-  28879305, 27588418,  // panel 18
-  27588419,            // 37th — trimmed to keep even count
+  36330964, 36330966,   // slide 1  ✅ good pair
+  37274908, 19886272,   // slide 2  (noted, unchanged for now)
+  6568266,  6646601,    // slide 3  ✅ good pair
+  8746336,  8746847,    // slide 4  — user: pair 8746336 with 8746847
+  8733251,  8746841,    // slide 5  — user: pair 8733251 with 8746841
+  27588426, 8056089,    // slide 6  — orphaned, paired together
+  36330965, null,       // slide 7  — solo, right slot blank (fill later)
+  8348877,  8348817,    // slide 8  — user: pair these two
+  36082685, 16008307,   // slide 9
+  8331896,  35454852,   // slide 10 — 8331896 orphaned
+  35687398, 35673132,   // slide 11
+  27588416, 36330963,   // slide 12
+  36330925, 31223590,   // slide 13
+  31223592, 31223573,   // slide 14
+  31223570, 30744236,   // slide 15
+  30744237, 30744218,   // slide 16
+  27588411, 27588410,   // slide 17 ✅ paired per request
+  28879318, 28879305,   // slide 18
+  27588418, 27588419,   // slide 19
 ];
-const VID_CACHE_KEY = "creator_vidcache_v2";
+const VID_CACHE_KEY = "creator_vidcache_v3";
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -255,6 +255,7 @@ async function loadVideos() {
   let vidCache = JSON.parse(localStorage.getItem(VID_CACHE_KEY) || "{}");
   try {
     const fetched = await Promise.all(VIDEO_IDS.map(async (id) => {
+      if (id === null) return { _blank: true }; // explicit blank slot
       if (vidCache[id]) return vidCache[id];
       try {
         const res = await fetch(`https://api.pexels.com/videos/videos/${id}`,
@@ -266,9 +267,8 @@ async function loadVideos() {
       } catch { return null; }
     }));
     localStorage.setItem(VID_CACHE_KEY, JSON.stringify(vidCache));
-    let videos = fetched.filter(v => v && getBestVideoSrc(v, "sd"));
-    if (videos.length % 2 !== 0 && videos.length > 1) videos = videos.slice(0, videos.length - 1);
-    galleryVideos = videos;
+    // Keep blank sentinels; drop failed fetches. No even-trim — pairing is explicit.
+    galleryVideos = fetched.filter(v => v && (v._blank || getBestVideoSrc(v, "hd")));
     renderVideoGallery();
     renderVideoDots();
   } catch {}
@@ -281,13 +281,20 @@ function renderVideoGallery() {
   grid.style.width = `${total * 100}%`;
   grid.style.setProperty("--slide-count", total);
   const slides = [];
+  // Track real video index separately (blanks don't count for lightbox idx)
+  let vidIdx = 0;
   for (let i = 0; i < galleryVideos.length; i += 2) {
     const v1 = galleryVideos[i];
     const v2 = galleryVideos[i + 1];
-    slides.push(`<div class="gallery-slide">
-      <video src="${esc(getBestVideoSrc(v1, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i})" title="Click to watch full screen"></video>
-      ${v2 ? `<video src="${esc(getBestVideoSrc(v2, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
-    </div>`);
+    const i1 = vidIdx;
+    if (!v1._blank) vidIdx++;
+    const i2 = vidIdx;
+    if (v2 && !v2._blank) vidIdx++;
+    const slot1 = v1._blank ? '' :
+      `<video src="${esc(getBestVideoSrc(v1, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i1})" title="Click to watch full screen"></video>`;
+    const slot2 = (!v2 || v2._blank) ? '' :
+      `<video src="${esc(getBestVideoSrc(v2, 'hd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" title="Click to watch full screen"></video>`;
+    slides.push(`<div class="gallery-slide">${slot1}${slot2}</div>`);
   }
   if (slides.length) slides.push(slides[0]);
   grid.innerHTML = slides.join("");
@@ -359,25 +366,29 @@ function videoNext() {
 
 let lightboxVideoIdx = 0;
 
+const realVideos = () => galleryVideos.filter(v => !v._blank);
+
 function openVideoLightbox(idx) {
   lightboxVideoIdx = idx;
-  const v = galleryVideos[idx];
+  const v = realVideos()[idx];
   $("videoLightboxSrc").src = getBestVideoSrc(v, "hd");
   const vid = $("videoLightboxVid");
   vid.load();
   vid.play().catch(() => {});
-  $("videoLightboxCounter").textContent = `${idx + 1} / ${galleryVideos.length}`;
+  $("videoLightboxCounter").textContent = `${idx + 1} / ${realVideos().length}`;
   $("videoLightbox").hidden = false;
   document.body.style.overflow = "hidden";
 }
 
 function videoLightboxPrev() {
-  lightboxVideoIdx = (lightboxVideoIdx - 1 + galleryVideos.length) % galleryVideos.length;
+  const len = realVideos().length;
+  lightboxVideoIdx = (lightboxVideoIdx - 1 + len) % len;
   openVideoLightbox(lightboxVideoIdx);
 }
 
 function videoLightboxNext() {
-  lightboxVideoIdx = (lightboxVideoIdx + 1) % galleryVideos.length;
+  const len = realVideos().length;
+  lightboxVideoIdx = (lightboxVideoIdx + 1) % len;
   openVideoLightbox(lightboxVideoIdx);
 }
 
