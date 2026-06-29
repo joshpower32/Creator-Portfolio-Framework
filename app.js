@@ -113,8 +113,9 @@ function slideCount() { return Math.max(1, Math.ceil(galleryPhotos.length / 2));
 function renderGallery() {
   const grid = $("galleryGrid");
   const sc = slideCount();
-  grid.style.width = `${sc * 100}%`;
-  grid.style.setProperty("--slide-count", sc);
+  const total = sc + 1; // +1 clone of slide 0 at the end for infinite wrap
+  grid.style.width = `${total * 100}%`;
+  grid.style.setProperty("--slide-count", total);
 
   const slides = [];
   for (let i = 0; i < galleryPhotos.length; i += 2) {
@@ -125,20 +126,22 @@ function renderGallery() {
       ${p2 ? `<img src="${esc(p2.src.large)}" alt="Photo ${i + 2}" loading="lazy" onclick="openLightbox(${i + 1})" title="Click to view full size">` : ""}
     </div>`);
   }
+  // Clone of first slide — enables seamless right-wrap
+  if (slides.length) slides.push(slides[0]);
   grid.innerHTML = slides.join("");
   updateGalleryScroll();
 }
 
 function updateGalleryScroll() {
-  const sc = slideCount();
-  // Moving 1 slide = (1/sc) * 100% of the total grid width = exactly 1 viewport width
-  $("galleryGrid").style.transform = `translateX(${-currentSlide * (100 / sc)}%)`;
+  const total = slideCount() + 1;
+  $("galleryGrid").style.transform = `translateX(${-currentSlide * (100 / total)}%)`;
 }
 
 function renderGalleryDots() {
   const sc = slideCount();
+  const active = currentSlide >= sc ? 0 : currentSlide;
   $("galleryDots").innerHTML = Array.from({ length: sc }, (_, i) =>
-    `<button class="gallery-dot ${i === currentSlide ? "active" : ""}" onclick="setSlide(${i})" aria-label="Slide ${i + 1}"></button>`
+    `<button class="gallery-dot ${i === active ? "active" : ""}" onclick="setSlide(${i})" aria-label="Slide ${i + 1}"></button>`
   ).join("");
 }
 
@@ -149,7 +152,27 @@ function setSlide(i) {
 }
 
 function galleryPrev() { setSlide(currentSlide - 1); }
-function galleryNext() { setSlide(currentSlide + 1); }
+function galleryNext() {
+  const sc = slideCount();
+  if (currentSlide >= sc - 1) {
+    // Animate into the clone, then snap back to real slide 0
+    currentSlide = sc;
+    updateGalleryScroll();
+    renderGalleryDots();
+    setTimeout(() => {
+      const grid = $("galleryGrid");
+      grid.style.transition = "none";
+      currentSlide = 0;
+      updateGalleryScroll();
+      renderGalleryDots();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        grid.style.transition = "";
+      }));
+    }, 420);
+  } else {
+    setSlide(currentSlide + 1);
+  }
+}
 
 // --- Lightbox: scrolls 1 photo at a time ---
 function openLightbox(photoIdx) {
@@ -236,8 +259,9 @@ async function loadVideos() {
 function renderVideoGallery() {
   const grid = $("videoGrid");
   const sc = videoSlideCount();
-  grid.style.width = `${sc * 100}%`;
-  grid.style.setProperty("--slide-count", sc);
+  const total = sc + 1;
+  grid.style.width = `${total * 100}%`;
+  grid.style.setProperty("--slide-count", total);
   const slides = [];
   for (let i = 0; i < galleryVideos.length; i += 2) {
     const v1 = galleryVideos[i];
@@ -247,19 +271,22 @@ function renderVideoGallery() {
       ${v2 ? `<video src="${esc(getBestVideoSrc(v2, 'sd'))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i + 1})" title="Click to watch full screen"></video>` : ""}
     </div>`);
   }
+  if (slides.length) slides.push(slides[0]);
   grid.innerHTML = slides.join("");
   updateVideoScroll();
   playCurrentVideoSlide();
 }
 
 function updateVideoScroll() {
-  const sc = videoSlideCount();
-  $("videoGrid").style.transform = `translateX(${-currentVideoSlide * (100 / sc)}%)`;
+  const total = videoSlideCount() + 1;
+  $("videoGrid").style.transform = `translateX(${-currentVideoSlide * (100 / total)}%)`;
 }
 
 function renderVideoDots() {
-  $("videoDots").innerHTML = Array.from({ length: videoSlideCount() }, (_, i) =>
-    `<button class="gallery-dot ${i === currentVideoSlide ? "active" : ""}" onclick="setVideoSlide(${i})" aria-label="Video slide ${i + 1}"></button>`
+  const sc = videoSlideCount();
+  const active = currentVideoSlide >= sc ? 0 : currentVideoSlide;
+  $("videoDots").innerHTML = Array.from({ length: sc }, (_, i) =>
+    `<button class="gallery-dot ${i === active ? "active" : ""}" onclick="setVideoSlide(${i})" aria-label="Video slide ${i + 1}"></button>`
   ).join("");
 }
 
@@ -281,7 +308,28 @@ function setVideoSlide(i) {
 }
 
 function videoPrev() { setVideoSlide(currentVideoSlide - 1); }
-function videoNext() { setVideoSlide(currentVideoSlide + 1); }
+function videoNext() {
+  const sc = videoSlideCount();
+  if (currentVideoSlide >= sc - 1) {
+    currentVideoSlide = sc;
+    updateVideoScroll();
+    renderVideoDots();
+    playCurrentVideoSlide();
+    setTimeout(() => {
+      const grid = $("videoGrid");
+      grid.style.transition = "none";
+      currentVideoSlide = 0;
+      updateVideoScroll();
+      renderVideoDots();
+      playCurrentVideoSlide();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        grid.style.transition = "";
+      }));
+    }, 420);
+  } else {
+    setVideoSlide(currentVideoSlide + 1);
+  }
+}
 
 function openVideoLightbox(idx) {
   const v = galleryVideos[idx];
