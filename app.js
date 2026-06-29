@@ -211,6 +211,8 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") lightboxNext();
   } else if (!$("videoLightbox").hidden) {
     if (e.key === "Escape") closeVideoLightbox();
+    if (e.key === "ArrowLeft") videoLightboxPrev();
+    if (e.key === "ArrowRight") videoLightboxNext();
   } else {
     if (e.key === "ArrowLeft") galleryPrev();
     if (e.key === "ArrowRight") galleryNext();
@@ -331,14 +333,28 @@ function videoNext() {
   }
 }
 
+let lightboxVideoIdx = 0;
+
 function openVideoLightbox(idx) {
+  lightboxVideoIdx = idx;
   const v = galleryVideos[idx];
   $("videoLightboxSrc").src = getBestVideoSrc(v, "hd");
   const vid = $("videoLightboxVid");
   vid.load();
   vid.play().catch(() => {});
+  $("videoLightboxCounter").textContent = `${idx + 1} / ${galleryVideos.length}`;
   $("videoLightbox").hidden = false;
   document.body.style.overflow = "hidden";
+}
+
+function videoLightboxPrev() {
+  lightboxVideoIdx = (lightboxVideoIdx - 1 + galleryVideos.length) % galleryVideos.length;
+  openVideoLightbox(lightboxVideoIdx);
+}
+
+function videoLightboxNext() {
+  lightboxVideoIdx = (lightboxVideoIdx + 1) % galleryVideos.length;
+  openVideoLightbox(lightboxVideoIdx);
 }
 
 function closeVideoLightbox() {
@@ -353,6 +369,8 @@ $("videoPrev").addEventListener("click", videoPrev);
 $("videoNext").addEventListener("click", videoNext);
 $("videoLightboxClose").addEventListener("click", closeVideoLightbox);
 $("videoLightboxBackdrop").addEventListener("click", closeVideoLightbox);
+$("videoLightboxPrev").addEventListener("click", videoLightboxPrev);
+$("videoLightboxNext").addEventListener("click", videoLightboxNext);
 
 // --- Render Social Links ---
 function renderSocialLinks() {
