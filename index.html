@@ -6,8 +6,10 @@
     <title>@YourName — Creator Portfolio & Shop</title>
     <meta name="description" content="Premium content creator. Shop exclusive merchandise, access exclusive content, and connect on social media.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://pub-90343f1a234549689c19246f72b2487c.r2.dev">
     <link rel="preconnect" href="https://images.pexels.com">
     <link rel="preconnect" href="https://api.pexels.com" crossorigin>
+    <link rel="dns-prefetch" href="https://buy.stripe.com">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -278,7 +280,7 @@
         <div class="lightbox-backdrop" id="videoLightboxBackdrop"></div>
         <button class="lightbox-close" id="videoLightboxClose" aria-label="Close">✕</button>
         <button class="lightbox-prev" id="videoLightboxPrev" aria-label="Previous video">❮</button>
-        <video id="videoLightboxVid" loop playsinline autoplay preload="auto">
+        <video id="videoLightboxVid" loop playsinline preload="none">
             <source id="videoLightboxSrc" src="" type="video/mp4">
         </video>
         <button class="lightbox-next" id="videoLightboxNext" aria-label="Next video">❯</button>
@@ -288,6 +290,6 @@
     <!-- ===== Toast ===== -->
     <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
 
-    <script src="app.js"></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
