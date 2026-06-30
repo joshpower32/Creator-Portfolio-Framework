@@ -75,7 +75,7 @@ async function loadGalleryImages() {
   if (USE_LOCAL_ASSETS) {
     let photos = GALLERY_IDS.map(id => ({
       id,
-      src: { large: `assets/photos/${id}.jpg`, large2x: `assets/photos/${id}.jpg` },
+      src: { large: `${CDN_BASE}/photos/${id}.jpg`, large2x: `${CDN_BASE}/photos/${id}.jpg` },
     }));
     if (photos.length % 2 !== 0) photos = photos.slice(0, photos.length - 1);
     galleryPhotos = photos;
@@ -530,7 +530,7 @@ function renderProducts() {
 async function loadAboutPhoto() {
   const el = $("aboutImage");
   if (USE_LOCAL_ASSETS) {
-    el.style.backgroundImage = `url("assets/photos/${ABOUT_PHOTO_ID}.jpg")`;
+    el.style.backgroundImage = `url("${CDN_BASE}/photos/${ABOUT_PHOTO_ID}.jpg")`;
     el.style.backgroundSize = "cover";
     el.style.backgroundPosition = "center top";
     return;
@@ -556,7 +556,7 @@ async function loadAboutPhoto() {
 async function loadHeroBg() {
   const el = $("heroBg");
   if (USE_LOCAL_ASSETS) {
-    el.style.backgroundImage = `url("assets/photos/${HERO_PHOTO_ID}.jpg")`;
+    el.style.backgroundImage = `url("${CDN_BASE}/photos/${HERO_PHOTO_ID}.jpg")`;
     return;
   }
   const cacheKey = "__hero";
