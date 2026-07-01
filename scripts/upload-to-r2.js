@@ -115,11 +115,20 @@ async function pexelsPhoto(id) {
   return p.src?.large2x || p.src?.large;
 }
 
-async function pexelsVideo(id) {
+const videoMetaCache = new Map();
+
+async function fetchVideoMeta(id) {
+  if (videoMetaCache.has(id)) return videoMetaCache.get(id);
   const res = await fetch(`https://api.pexels.com/videos/videos/${id}`,
     { headers: { Authorization: PEXELS_KEY } });
   if (!res.ok) throw new Error(`Pexels ${res.status}`);
   const data = await res.json();
+  videoMetaCache.set(id, data);
+  return data;
+}
+
+async function pexelsVideo(id) {
+  const data = await fetchVideoMeta(id);
   const mp4 = (data.video_files || []).filter(f => f.file_type === "video/mp4");
   const portrait = mp4.filter(f => f.height >= f.width);
   const pool = portrait.length ? portrait : mp4;
@@ -128,6 +137,12 @@ async function pexelsVideo(id) {
   const link = (hd || sorted[0])?.link;
   if (!link) throw new Error("no MP4 found");
   return link;
+}
+
+async function pexelsVideoPoster(id) {
+  const data = await fetchVideoMeta(id);
+  if (!data.image) throw new Error("no poster image found");
+  return data.image;
 }
 
 (async () => {
@@ -150,7 +165,14 @@ async function pexelsVideo(id) {
     success ? ok++ : fail++;
   }
 
-  const total = ALL_PHOTO_IDS.length + UNIQUE_VIDEO_IDS.length;
+  // --- Video posters ---
+  console.log(`\n🖼️  Video posters (${UNIQUE_VIDEO_IDS.length})`);
+  for (const id of UNIQUE_VIDEO_IDS) {
+    const success = await processAsset(`[poster ${id}]`, `posters/${id}.jpg`, "image/jpeg", () => pexelsVideoPoster(id));
+    success ? ok++ : fail++;
+  }
+
+  const total = ALL_PHOTO_IDS.length + UNIQUE_VIDEO_IDS.length * 2;
   console.log(`\n✅ Done — ${ok}/${total} assets in R2, ${fail} failed`);
   console.log(`\nPublic base: ${PUBLIC_URL}`);
 })();

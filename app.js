@@ -313,9 +313,9 @@ function renderVideoGallery() {
     const i2 = vidIdx;
     if (v2 && !v2._blank) vidIdx++;
     const slot1 = v1._blank ? '' :
-      `<video src="${esc(getBestVideoSrc(v1))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i1})" title="Click to watch full screen"></video>`;
+      `<video src="${esc(getBestVideoSrc(v1))}" muted loop playsinline preload="none" poster="${esc(v1.image || '')}" onclick="openVideoLightbox(${i1})" onerror="handleVideoError(this)" title="Click to watch full screen"></video>`;
     const slot2 = (!v2 || v2._blank) ? '' :
-      `<video src="${esc(getBestVideoSrc(v2))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" title="Click to watch full screen"></video>`;
+      `<video src="${esc(getBestVideoSrc(v2))}" muted loop playsinline preload="none" poster="${esc(v2.image || '')}" onclick="openVideoLightbox(${i2})" onerror="handleVideoError(this)" title="Click to watch full screen"></video>`;
     slides.push(`<div class="gallery-slide">${slot1}${slot2}</div>`);
   }
   // [clone of last] + real slides + [clone of first]
@@ -335,6 +335,38 @@ function renderVideoDots() {
   $("videoDots").innerHTML = Array.from({ length: sc }, (_, i) =>
     `<button class="gallery-dot ${i === active ? "active" : ""}" onclick="setVideoSlide(${i})" aria-label="Video slide ${i + 1}"></button>`
   ).join("");
+}
+
+function clearLoadWatchdog(v) {
+  if (v._loadWatchdog) {
+    clearTimeout(v._loadWatchdog);
+    v._loadWatchdog = null;
+  }
+}
+
+// Browsers don't always fire an `error` event when a cross-origin request
+// gets blocked (e.g. Chrome's ORB) — the video just sits in NETWORK_LOADING
+// forever. This watchdog catches that "stuck, never errors" case too.
+function armLoadWatchdog(v, ms = 7000) {
+  clearLoadWatchdog(v);
+  v._loadWatchdog = setTimeout(() => {
+    if (v.readyState < 2) handleVideoError(v);
+  }, ms);
+}
+
+function handleVideoError(v) {
+  clearLoadWatchdog(v);
+  const retries = (v._errorRetries || 0) + 1;
+  v._errorRetries = retries;
+  v.classList.remove("video-error");
+  if (retries <= 2) {
+    // Transient network hiccup — back off briefly and try loading again.
+    setTimeout(() => { armLoadWatchdog(v); v.load(); }, 800 * retries);
+    return;
+  }
+  // Genuinely broken source — stop retrying and show a clear placeholder
+  // instead of a dead black box.
+  v.classList.add("video-error");
 }
 
 function playCurrentVideoSlide() {
@@ -358,7 +390,7 @@ function playCurrentVideoSlide() {
 
       if (isCurrent) {
         v.preload = "auto";
-        const tryPlay = () => v.play().catch(() => {});
+        const tryPlay = () => { clearLoadWatchdog(v); v.play().catch(() => {}); };
         v._stallHandler = () => setTimeout(tryPlay, 300);
         v.addEventListener("waiting", v._stallHandler);
         v.addEventListener("stalled", v._stallHandler);
@@ -373,6 +405,7 @@ function playCurrentVideoSlide() {
           // register canplay listener first, then call load()
           v._canplayHandler = tryPlay;
           v.addEventListener("canplay", v._canplayHandler, { once: true });
+          armLoadWatchdog(v);
           v.load();
         }
       } else if (isNeighbor) {
@@ -381,6 +414,7 @@ function playCurrentVideoSlide() {
       } else {
         v.preload = "none";
         v.pause();
+        clearLoadWatchdog(v);
       }
     });
   });
@@ -439,19 +473,29 @@ function openVideoLightbox(idx) {
   const v = realVideos()[idx];
   const vid = $("videoLightboxVid");
 
-  // Remove any previous stall handler
+  // Remove any previous stall/error handler
   if (vid._stallHandler) {
     vid.removeEventListener("waiting", vid._stallHandler);
     vid.removeEventListener("stalled", vid._stallHandler);
     vid._stallHandler = null;
   }
+  if (vid._errorHandler) {
+    vid.removeEventListener("error", vid._errorHandler);
+    vid._errorHandler = null;
+  }
+
+  vid.classList.remove("video-error");
+  vid._errorRetries = 0;
+  vid._errorHandler = () => handleVideoError(vid);
+  vid.addEventListener("error", vid._errorHandler);
 
   const src = getBestVideoSrc(v);
   $("videoLightboxSrc").src = src;
   vid.preload = "auto";
+  armLoadWatchdog(vid);
   vid.load();
 
-  const tryPlay = () => vid.play().catch(() => {});
+  const tryPlay = () => { clearLoadWatchdog(vid); vid.play().catch(() => {}); };
 
   vid._stallHandler = () => setTimeout(tryPlay, 300);
   vid.addEventListener("waiting", vid._stallHandler);
