@@ -45,13 +45,16 @@ const CONFIG = {
   creatorName: "@YourName",
 };
 
+// url: "#" — placeholder only. Real creator-specific profile links get filled
+// in during customization; leaving real handles here would point to
+// unrelated third-party accounts that happen to own "yourname".
 const SOCIAL_LINKS = [
-  { id: "instagram", name: "Instagram", icon: "📷", url: "https://instagram.com/yourname", handle: "@yourname", sub: "Daily photos, stories & behind-the-scenes", cta: "Follow Me" },
-  { id: "tiktok", name: "TikTok", icon: "🎵", url: "https://tiktok.com/@yourname", handle: "@yourname", sub: "Trending videos & viral content", cta: "Follow on TikTok" },
-  { id: "onlyfans", name: "OnlyFans", icon: "🔥", url: "https://onlyfans.com/yourname", handle: "yourname", sub: "Exclusive content you won't find anywhere else", cta: "Subscribe Now" },
-  { id: "twitter", name: "Twitter / X", icon: "𝕏", url: "https://twitter.com/yourname", handle: "@yourname", sub: "Uncensored thoughts, polls & updates", cta: "Follow Me" },
-  { id: "youtube", name: "YouTube", icon: "▶️", url: "https://youtube.com/@yourname", handle: "@yourname", sub: "Full-length videos, vlogs & Q&As", cta: "Subscribe" },
-  { id: "twitch", name: "Twitch", icon: "📺", url: "https://twitch.tv/yourname", handle: "yourname", sub: "Live streams — hang out in real time", cta: "Follow & Watch Live" },
+  { id: "instagram", name: "Instagram", icon: "📷", url: "#", handle: "@yourname", sub: "Daily photos, stories & behind-the-scenes", cta: "Follow Me" },
+  { id: "tiktok", name: "TikTok", icon: "🎵", url: "#", handle: "@yourname", sub: "Trending videos & viral content", cta: "Follow on TikTok" },
+  { id: "onlyfans", name: "OnlyFans", icon: "🔥", url: "#", handle: "yourname", sub: "Exclusive content you won't find anywhere else", cta: "Subscribe Now" },
+  { id: "twitter", name: "Twitter / X", icon: "𝕏", url: "#", handle: "@yourname", sub: "Uncensored thoughts, polls & updates", cta: "Follow Me" },
+  { id: "youtube", name: "YouTube", icon: "▶️", url: "#", handle: "@yourname", sub: "Full-length videos, vlogs & Q&As", cta: "Subscribe" },
+  { id: "twitch", name: "Twitch", icon: "📺", url: "#", handle: "yourname", sub: "Live streams — hang out in real time", cta: "Follow & Watch Live" },
 ];
 
 const PRODUCTS = [
@@ -544,14 +547,20 @@ $("videoLightboxNext").addEventListener("click", videoLightboxNext);
 // --- Render Social Links ---
 function renderSocialLinks() {
   const grid = $("linksGrid");
-  grid.innerHTML = SOCIAL_LINKS.map((link) => `
-    <a href="${esc(link.url)}" target="_blank" rel="noopener" class="link-card">
+  grid.innerHTML = SOCIAL_LINKS.map((link) => {
+    const isPlaceholder = link.url === "#";
+    const attrs = isPlaceholder
+      ? `href="#" onclick="return false;"`
+      : `href="${esc(link.url)}" target="_blank" rel="noopener"`;
+    return `
+    <a ${attrs} class="link-card">
       <div class="link-icon">${link.icon}</div>
       <h3>${esc(link.name)}</h3>
       <p class="link-handle">${esc(link.handle)}</p>
       <p>${esc(link.sub)}</p>
       <span class="link-cta">${esc(link.cta)} →</span>
-    </a>`).join("");
+    </a>`;
+  }).join("");
 }
 
 // --- Render Products ---
