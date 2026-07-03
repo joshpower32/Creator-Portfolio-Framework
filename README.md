@@ -1,6 +1,6 @@
 # Creator Portfolio — Premium Creator/Model Website
 
-A professional, modern website for content creators, models, influencers, and OnlyFans creators. Features a **photo gallery**, **social media link aggregator**, **merchandise shop**, **exclusive subscription tiers**, and **contact form**. Pure HTML/CSS/JS — no build step, free hosting on GitHub Pages or Netlify.
+A professional, modern website for fashion models, photographers, and content creators. Features a **photo gallery**, **social media link aggregator**, **merchandise shop**, **exclusive membership tiers**, and **contact form**. Pure HTML/CSS/JS — no build step, free hosting on GitHub Pages or Netlify.
 
 Built for creators who want to:
 - Showcase their best content
@@ -13,7 +13,7 @@ Built for creators who want to:
 
 - **Hero section** with premium gradient design
 - **Portfolio gallery** with arrow navigation and Pexels photo integration
-- **Social media links** — Instagram, TikTok, OnlyFans, Twitter, YouTube, Twitch (fully customizable)
+- **Social media links** — Instagram, TikTok, Booking, Twitter, YouTube, Twitch (fully customizable)
 - **Shop section** — digital products, merchandise, exclusive content
 - **Exclusive membership tiers** — Fan Club ($9.99), VIP Club ($19.99), Platinum ($49.99) with features
 - **About section** with creator bio and portrait photo
@@ -34,7 +34,7 @@ Built for creators who want to:
    - Update creator email, location, bio
 
 3. **Social media links** — edit `SOCIAL_LINKS` array in `app.js`:
-   - Update URLs for all platforms (Instagram, TikTok, OnlyFans, etc.)
+   - Update URLs for all platforms (Instagram, TikTok, Booking, etc.)
    - Can add/remove platforms as needed
 
 4. **Products/Merchandise** — edit `PRODUCTS` array in `app.js`:
@@ -83,7 +83,6 @@ Currently the site shows subscription tiers and products, but payment processing
 **For subscriptions:**
 - Wire to **Stripe** (recurring subscriptions)
 - Or **Patreon** (creator membership platform)
-- Or **OnlyFans** (if they already use it)
 
 **For products:**
 - Wire to **Gumroad** (digital products)
@@ -110,9 +109,9 @@ The buttons currently link to `#contact` — customize the destination based on 
 
 ## Best For
 
-- Models and content creators
+- Fashion and portfolio models
 - Influencers (Instagram, TikTok, YouTube)
-- OnlyFans creators (as a funnel / sales page)
+- Content creators building a central hub
 - Photographers and artists
 - Anyone selling digital or physical products
 - Anyone who wants to centralize their online presence
@@ -123,7 +122,6 @@ This is a complete, sellable template for creators, models, influencers, and con
 
 **Potential clients:**
 - Models (build portfolio + fan engagement)
-- OnlyFans creators (drive traffic, build email list, sell merch)
 - Content creators (centralize social, sell products)
 - Influencers (aggregate followers, sell courses/coaching)
 - Photographers (showcase work + sell prints)
