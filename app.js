@@ -4,34 +4,34 @@
 
 // Hardcoded Pexels photo IDs — gallery, hero, about all pinned to specific shots
 const GALLERY_IDS = [
-  12757296, // purple neon bed — moody dark
-  5393845,  // black bob knit wrap — elegant
-  8169253,  // red bodysuit dark background
-  6130800,  // satin & rose — luxe
-  12995318, // red lingerie with roses on bed
-  12001720, // black bodysuit red gloves
-  10670356, // leather jacket red chair
-  13400492, // blue glowing stool — artistic
-  7037652,  // black lace lingerie standing
-  12018041, // redhead black corset
-  13441424, // colourful studio lighting
-  5498471,  // black harness mask on bed
-  289227,   // overhead pink floor — curly hair
-  12642189, // young woman black lace pink bg
-  8649515,  // black bob plaid dark interior
+  29940495, // editorial portrait, red dress, London studio
+  35587808, // black & white editorial fashion portrait
+  30736118, // high fashion model, white dress, studio
+  4355345,  // fashion portrait behind mesh veil
+  2418518,  // model portrait, studio
+  30472385, // fashion editorial, moody studio
+  30736117, // fashion model, white dress, studio
+  18651085, // model walking, streetwear fashion show
+  14801125, // model in sequin dress, fashion show
+  31109965, // fashion portrait, London street
+  31530937, // urban night portrait
+  30451277, // street style, red coat, Paris
+  9969339,  // fashion photography, city street
+  30831434, // urban youth street style portrait
+  14041408, // portrait, gold dress, studio
 ];
-const ABOUT_PHOTO_ID = 11103030; // dark red lingerie, face visible
-const HERO_PHOTO_ID  = 3160389;  // dark editorial — woman in black, moody bg
+const ABOUT_PHOTO_ID = 26274786; // studio portrait, editorial fashion look
+const HERO_PHOTO_ID  = 17590615; // model in black, studio, white background
 
 const VIDEO_IDS = [
-  27588385, 27588382,  // slide 1  — yellow bikini babe
-  30744225, 16093155,  // slide 2
-  28879318, 28879306,  // slide 3
-  8746336,  8746847,   // slide 4  — brunette red sheet 2
-  35673203, 35454852,  // slide 5  — white bikini adorable
-  30744218, 27989385,  // slide 6  — wet and black lingerie
-  27588411, 27588410,  // slide 7  — painting hottie
-  27588416, 27588419,  // slide 8  — 2 thick babes
+  9512048,  9511841,   // slide 1  — runway walk / catwalk
+  19862866, 9512045,   // slide 2  — runway show
+  7779784,  3917742,   // slide 3  — photoshoot BTS / wardrobe styling
+  8177624,  8484890,   // slide 4  — clothing rack / designer at work
+  7679416,  15526547,  // slide 5  — boutique styling / glamour outfit
+  5901094,  3894705,   // slide 6  — editorial posing
+  7719656,  8508647,   // slide 7  — model posing, studio
+  8943618,  3403226,   // slide 8  — posed video shoot
 ];
 const VID_CACHE_KEY = "creator_vidcache_v15";
 
@@ -51,7 +51,7 @@ const CONFIG = {
 const SOCIAL_LINKS = [
   { id: "instagram", name: "Instagram", icon: "📷", url: "#", handle: "@yourname", sub: "Daily photos, stories & behind-the-scenes", cta: "Follow Me" },
   { id: "tiktok", name: "TikTok", icon: "🎵", url: "#", handle: "@yourname", sub: "Trending videos & viral content", cta: "Follow on TikTok" },
-  { id: "onlyfans", name: "OnlyFans", icon: "🔥", url: "#", handle: "yourname", sub: "Exclusive content you won't find anywhere else", cta: "Subscribe Now" },
+  { id: "booking", name: "Booking", icon: "📅", url: "#", handle: "yourname", sub: "Check availability & book a shoot", cta: "Book Now" },
   { id: "twitter", name: "Twitter / X", icon: "𝕏", url: "#", handle: "@yourname", sub: "Uncensored thoughts, polls & updates", cta: "Follow Me" },
   { id: "youtube", name: "YouTube", icon: "▶️", url: "#", handle: "@yourname", sub: "Full-length videos, vlogs & Q&As", cta: "Subscribe" },
   { id: "twitch", name: "Twitch", icon: "📺", url: "#", handle: "yourname", sub: "Live streams — hang out in real time", cta: "Follow & Watch Live" },
@@ -108,7 +108,7 @@ async function loadGalleryImages() {
     const existIds = new Set(photos.map(p => p.id));
     try {
       const res = await fetch(
-        `https://api.pexels.com/v1/search?query=woman+portrait+lingerie+model&per_page=${need + 4}&orientation=portrait&page=1`,
+        `https://api.pexels.com/v1/search?query=fashion+model+editorial+portrait&per_page=${need + 4}&orientation=portrait&page=1`,
         { headers: { Authorization: CONFIG.pexelsKey } });
       if (res.ok) {
         const data = await res.json();
@@ -724,3 +724,4 @@ renderSocialLinks();
 renderProducts();
 loadAboutPhoto();
 loadHeroBg();
+
