@@ -73,53 +73,17 @@ const GALLERY_TARGET = 14;  // matches verified IDs — fallback only fires on g
 const IMG_CACHE_KEY = "creator_imgcache_v10";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
-// --- Load gallery: hardcoded IDs + fallback fill ---
+// --- Load gallery: fully static Pexels CDN URLs, no API/key needed ---
+function pexelsPhotoUrl(id) {
+  return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1260`;
+}
+
 async function loadGalleryImages() {
-  if (USE_LOCAL_ASSETS) {
-    let photos = GALLERY_IDS.map(id => ({
-      id,
-      src: { large: `${CDN_BASE}/photos/${id}.jpg`, large2x: `${CDN_BASE}/photos/${id}.jpg` },
-    }));
-    if (photos.length % 2 !== 0) photos = photos.slice(0, photos.length - 1);
-    galleryPhotos = photos;
-    renderGallery();
-    renderGalleryDots();
-    return;
-  }
-
-  // Pexels API fallback (used if USE_LOCAL_ASSETS is false)
-  const fetched = await Promise.all(GALLERY_IDS.map(async (id) => {
-    const cacheKey = "pid_" + id;
-    if (imgCache[cacheKey]) return imgCache[cacheKey];
-    try {
-      const res = await fetch(`https://api.pexels.com/v1/photos/${id}`,
-        { headers: { Authorization: CONFIG.pexelsKey } });
-      if (!res.ok) return null;
-      const p = await res.json();
-      imgCache[cacheKey] = p;
-      return p;
-    } catch { return null; }
+  let photos = GALLERY_IDS.map(id => ({
+    id,
+    src: { large: pexelsPhotoUrl(id), large2x: pexelsPhotoUrl(id) },
   }));
-
-  let photos = fetched.filter(Boolean);
-
-  if (photos.length < GALLERY_TARGET) {
-    const need = GALLERY_TARGET - photos.length;
-    const existIds = new Set(photos.map(p => p.id));
-    try {
-      const res = await fetch(
-        `https://api.pexels.com/v1/search?query=fashion+model+editorial+portrait&per_page=${need + 4}&orientation=portrait&page=1`,
-        { headers: { Authorization: CONFIG.pexelsKey } });
-      if (res.ok) {
-        const data = await res.json();
-        const extras = (data.photos || []).filter(p => !existIds.has(p.id)).slice(0, need);
-        photos = [...photos, ...extras];
-      }
-    } catch { /* keep what we have */ }
-  }
-
-  if (photos.length % 2 !== 0 && photos.length > 1) photos = photos.slice(0, photos.length - 1);
-  localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
+  if (photos.length % 2 !== 0) photos = photos.slice(0, photos.length - 1);
   galleryPhotos = photos;
   renderGallery();
   renderGalleryDots();
@@ -582,49 +546,15 @@ function renderProducts() {
 // --- Load about photo ---
 async function loadAboutPhoto() {
   const el = $("aboutImage");
-  if (USE_LOCAL_ASSETS) {
-    el.style.backgroundImage = `url("${CDN_BASE}/photos/${ABOUT_PHOTO_ID}.jpg")`;
-    el.style.backgroundSize = "cover";
-    el.style.backgroundPosition = "center top";
-    return;
-  }
-  const cacheKey = "__about";
-  const cached = imgCache[cacheKey]?.url;
-  if (cached) { el.style.backgroundImage = `url("${cached}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; return; }
-  try {
-    const res = await fetch(`https://api.pexels.com/v1/photos/${ABOUT_PHOTO_ID}`,
-      { headers: { Authorization: CONFIG.pexelsKey } });
-    if (!res.ok) return;
-    const data = await res.json();
-    const url = data.src.large;
-    imgCache[cacheKey] = { url };
-    localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
-    el.style.backgroundImage = `url("${url}")`;
-    el.style.backgroundSize = "cover";
-    el.style.backgroundPosition = "center top";
-  } catch (_) {}
+  el.style.backgroundImage = `url("${pexelsPhotoUrl(ABOUT_PHOTO_ID)}")`;
+  el.style.backgroundSize = "cover";
+  el.style.backgroundPosition = "center top";
 }
 
 // --- Load hero background ---
 async function loadHeroBg() {
   const el = $("heroBg");
-  if (USE_LOCAL_ASSETS) {
-    el.style.backgroundImage = `url("${CDN_BASE}/photos/${HERO_PHOTO_ID}.jpg")`;
-    return;
-  }
-  const cacheKey = "__hero";
-  const cached = imgCache[cacheKey]?.url;
-  if (cached) { el.style.backgroundImage = `url("${cached}")`; return; }
-  try {
-    const res = await fetch(`https://api.pexels.com/v1/photos/${HERO_PHOTO_ID}`,
-      { headers: { Authorization: CONFIG.pexelsKey } });
-    if (!res.ok) return;
-    const data = await res.json();
-    const url = data.src.large;
-    imgCache[cacheKey] = { url };
-    localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache));
-    el.style.backgroundImage = `url("${url}")`;
-  } catch (_) {}
+  el.style.backgroundImage = `url("${pexelsPhotoUrl(HERO_PHOTO_ID)}")`;
 }
 
 // --- Contact Form ---
