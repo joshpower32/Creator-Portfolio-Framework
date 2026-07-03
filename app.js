@@ -35,8 +35,8 @@ const VIDEO_IDS = [
 ];
 const VID_CACHE_KEY = "creator_vidcache_v15";
 
-const USE_LOCAL_ASSETS = true;
-const CDN_BASE = "https://pub-90343f1a234549689c19246f72b2487c.r2.dev";
+const USE_LOCAL_ASSETS = false;
+const CDN_BASE = "https://pub-90343f1a234549689c19246f72b2487c.r2.dev"; // unused while USE_LOCAL_ASSETS is false
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
