@@ -623,6 +623,12 @@ navLinks.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => 
   navLinks.classList.remove("open");
   navToggle.setAttribute("aria-expanded", false);
 }));
+document.addEventListener("click", (e) => {
+  if (navLinks.classList.contains("open") && !navLinks.contains(e.target) && !navToggle.contains(e.target)) {
+    navLinks.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+});
 
 // --- Toast notifications ---
 let toastTimer;
