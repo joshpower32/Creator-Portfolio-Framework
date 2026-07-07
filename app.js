@@ -35,8 +35,8 @@ const VIDEO_IDS = [
 ];
 const VID_CACHE_KEY = "creator_vidcache_v15";
 
-const USE_LOCAL_ASSETS = false;
-const CDN_BASE = "https://pub-90343f1a234549689c19246f72b2487c.r2.dev"; // unused while USE_LOCAL_ASSETS is false
+const USE_LOCAL_ASSETS = true;
+const ASSET_BASE = "assets"; // photos/videos/posters ship with the site — no R2/CDN or Pexels calls at runtime
 
 const CONFIG = {
   pexelsKey: "4SuTxTJkprUsJAP1CZoSkd412wKx4EuXt7xfK5HzZf9DreiCe8Wv0twm",
@@ -73,15 +73,16 @@ const GALLERY_TARGET = 14;  // matches verified IDs — fallback only fires on g
 const IMG_CACHE_KEY = "creator_imgcache_v10";
 let imgCache = JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || "{}");
 
-// --- Load gallery: fully static Pexels CDN URLs, no API/key needed ---
-function pexelsPhotoUrl(id) {
+// --- Photo URLs: local assets/ folder, with Pexels CDN as the non-local fallback ---
+function photoUrl(id) {
+  if (USE_LOCAL_ASSETS) return `${ASSET_BASE}/photos/${id}.jpg`;
   return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1260`;
 }
 
 async function loadGalleryImages() {
   let photos = GALLERY_IDS.map(id => ({
     id,
-    src: { large: pexelsPhotoUrl(id), large2x: pexelsPhotoUrl(id) },
+    src: { large: photoUrl(id), large2x: photoUrl(id) },
   }));
   if (photos.length % 2 !== 0) photos = photos.slice(0, photos.length - 1);
   galleryPhotos = photos;
@@ -234,8 +235,8 @@ function getBestVideoSrc(v) {
 async function loadVideos() {
   if (USE_LOCAL_ASSETS) {
     galleryVideos = VIDEO_IDS.map(id => ({
-      video_files: [{ link: `${CDN_BASE}/videos/${id}.mp4`, file_type: "video/mp4", quality: "hd", width: 1920, height: 1080 }],
-      image: `${CDN_BASE}/posters/${id}.jpg`,
+      video_files: [{ link: `${ASSET_BASE}/videos/${id}.mp4`, file_type: "video/mp4", quality: "hd", width: 1920, height: 1080 }],
+      image: `${ASSET_BASE}/posters/${id}.jpg`,
     }));
     renderVideoGallery();
     renderVideoDots();
@@ -546,7 +547,7 @@ function renderProducts() {
 // --- Load about photo ---
 async function loadAboutPhoto() {
   const el = $("aboutImage");
-  el.style.backgroundImage = `url("${pexelsPhotoUrl(ABOUT_PHOTO_ID)}")`;
+  el.style.backgroundImage = `url("${photoUrl(ABOUT_PHOTO_ID)}")`;
   el.style.backgroundSize = "cover";
   el.style.backgroundPosition = "center top";
 }
@@ -554,7 +555,7 @@ async function loadAboutPhoto() {
 // --- Load hero background ---
 async function loadHeroBg() {
   const el = $("heroBg");
-  el.style.backgroundImage = `url("${pexelsPhotoUrl(HERO_PHOTO_ID)}")`;
+  el.style.backgroundImage = `url("${photoUrl(HERO_PHOTO_ID)}")`;
 }
 
 // --- Contact Form ---
